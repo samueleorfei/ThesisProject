@@ -1,34 +1,43 @@
 namespace Models
 
-type Operator =
-    | Not
-    | And
-    | Or
-    | Imp
-    | Iff
-    | ForAll
-    | Exists
-    | Equal
-    | Atom of string
-
 module Operation =
-    let evaluate (op: Operator): string =
+    let evaluate (op: Token) : string =
         match op with
-            | Not -> "-"
-            | And -> "&&"
-            | Or -> "||"
-            | Imp -> "->"
-            | Iff -> "<->"
-            | Equal -> "="
-            | Atom(x: string) -> x
-            | _ -> ""
+        | Token.Not -> "-"
+        | Token.And -> "&&"
+        | Token.Or -> "||"
+        | Token.Imp -> "->"
+        | Token.Iff -> "<->"
+        | Token.Eq -> "="
+        | Identifier(x) -> x
+        | OpenParenthesis -> "("
+        | ClosedParenthesis -> ")"
+        | Whitespace -> " "
 
-    let parse (op: string): Operator =
+    let parse (op: string) : Token =
         match op with
-            | "-" | "not" -> Not
-            | "&&" | "&" | "^" | "and" -> And
-            | "||" | "|" | "v" | "or" -> Or
-            | "->" | "-->" | "imp" -> Imp
-            | "<->" | "iff" -> Iff
-            | "=" | "==" | "eq" -> Equal
-            | _ -> Atom(op)
+        | "-"
+        | "not" -> Token.Not
+        | "&&"
+        | "&"
+        | "^"
+        | "and" -> Token.And
+        | "||"
+        | "|"
+        | "v"
+        | "or" -> Token.Or
+        | "->"
+        | "-->"
+        | "imp" -> Token.Imp
+        | "<->"
+        | "iff" -> Token.Iff
+        | "="
+        | "=="
+        | "eq" -> Token.Eq
+        | "("
+        | "["
+        | "{" -> OpenParenthesis
+        | ")"
+        | "]"
+        | "}" -> ClosedParenthesis
+        | _ -> Identifier(op)

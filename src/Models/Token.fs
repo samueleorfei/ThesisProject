@@ -3,14 +3,18 @@ namespace Models
 type TokenType =
     | Identifier
     | Whitespace
-    | Separator
     | OpenParenthesis
     | ClosedParenthesis
     | Operator
 
 type Token =
-    { Type: TokenType
-      Value: string
-      Start: int
-      End: int
-      Index: int }
+    | Identifier of string
+    | Whitespace
+    | OpenParenthesis
+    | ClosedParenthesis
+    | Not
+    | And
+    | Or
+    | Imp
+    | Iff
+    | Eq

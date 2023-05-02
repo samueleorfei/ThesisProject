@@ -1,5 +1,7 @@
 namespace Lexing
 
+open Models
+
 open System.Text.RegularExpressions
 
 module Lexer =
@@ -9,7 +11,7 @@ module Lexer =
               TokenType.Whitespace, "\s+"
               TokenType.OpenParenthesis, "(\{|\[|\()"
               TokenType.ClosedParenthesis, "(\}|\]|\))"
-              TokenType.Operator, "(--|&|\||->|<->|=)" ]
+              Operator, "(--|&|\||->|<->|=)" ]
 
     let tokenize (input: string) : Token list =
         let scanner (input: string) : string list =
@@ -26,7 +28,7 @@ module Lexer =
                 | false -> failwith "Input non valido"
                 | _ ->
                     match List.find (fun (k: TokenType) -> Regex.IsMatch(input, (Map.find k Grammar))) keys with
-                    | TokenType.Operator -> Operation.parse (input)
+                    | Operator -> Operation.parse (input)
                     | TokenType.Identifier -> Identifier input
                     | TokenType.OpenParenthesis -> OpenParenthesis
                     | TokenType.ClosedParenthesis -> ClosedParenthesis

@@ -1,5 +1,7 @@
 namespace Parsing
 
+open Models
+
 module Parser =
     type ParseError = string
 

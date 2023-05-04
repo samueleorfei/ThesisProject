@@ -13,7 +13,7 @@ module Lexer =
               TokenType.ClosedParenthesis, "(\}|\]|\))"
               Operator, "(--|&|\||->|<->|=)" ]
 
-    let tokenize (input: string) : Token list =
+    let tokenize input =
         let scanner (input: string) : string list =
             let rec split (slice: string, rule: string) : string list =
                 match Regex.IsMatch(slice, rule) with

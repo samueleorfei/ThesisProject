@@ -3,15 +3,20 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="./src/Models/Token.fs" />
-    <Compile Include="./src/Models/Formula.fs" />
+    <Compile Include="./src/Models/Formula/Formula.fsi" />
+    <Compile Include="./src/Models/Formula/Formula.fs" />
+
+    <Compile Include="./src/Models/Token/Token.fs" />
+
     <Compile Include="./src/Models/Operation.fs" />
 
     <Compile Include="./src/Utils/Word.fs" />
 
+    <Compile Include="./src/Lexer/Lexer.fsi" />
     <Compile Include="./src/Lexer/Lexer.fs" />
 
     <Compile Include="./src/Parser/Parser.fs" />

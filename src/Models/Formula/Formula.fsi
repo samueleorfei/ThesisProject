@@ -14,6 +14,6 @@ module Formula =
 
     val toString: AST<'T> -> string;
 
-    val parse: string -> AST<'T>;
+    val parse: 'T -> AST<'T>;
 
     val evaluate: AST<'T> -> bool list;

@@ -1,6 +1,6 @@
 namespace Lexing
 
-open Models
+open Models.Types
 
 module Lexer =
-    val tokenize: string -> Token list;
+    val tokenize: string -> Token<string> list;

@@ -3,7 +3,7 @@
 open Lexing
 open Parsing
 
-let test = "A <-> B & B | C"
+let test = "A & B"
 
 let lexedTest = Lexer.tokenize test
 

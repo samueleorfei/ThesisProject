@@ -1,21 +1,20 @@
 namespace Parsing
 
-open Models
-open Models.Formula
+open Models.Types
 
 module Parser =
     type ParseError = string
 
-    let parse (tokens: Token list) =
+    let parse (tokens: Token<string> list) =
         let constParser c tokens = Ok(c, tokens)
 
-        let parseIdentifier (tokens: Token list) =
+        let parseIdentifier tokens =
             match tokens with
-            | (Identifier x) :: tail -> Ok(x, tail)
+            | (Token.Identifier x) :: tail -> Ok(x, tail)
             | first :: _ -> Error $"expected an identifier, got {first}"
             | [] -> Error $"expected an identifier, got EOF"
 
-        let parseToken (t: Token, tokens: Token list) =
+        let parseToken (t: Token<'T>, tokens: Token<'T> list) =
             match tokens with
             | first :: tail when first = t -> Ok(t, tail)
             | first :: _ -> Error $"expected {t}, got {first}"
@@ -34,7 +33,7 @@ module Parser =
                 | Ok(result, rest) -> Ok(result, rest)
                 | Error e -> Error e
 
-        let rec parseOperator (tokens: Token list) =
+        let rec parseOperator (tokens: Token<'T> list) =
             match parseTerm tokens with
             | Error _ ->
                 match tokens with
@@ -67,14 +66,14 @@ module Parser =
                             | _ -> Error $"expected a binary operator, got {operator}"
                 | [] -> Error $"expected a binary operator, got EOF"
 
-        and parseParenthesis (tokens: Token list) =
-            match parseToken (OpenParenthesis, tokens) with
+        and parseParenthesis (tokens: Token<'T> list) =
+            match parseToken (Token.OpenParenthesis, tokens) with
             | Error e -> Error e
             | Ok(x, xs) ->
                 match parseExpression (xs) with
                 | Error e -> Error e
                 | Ok(f, ys) ->
-                    match parseToken (ClosedParenthesis, ys) with
+                    match parseToken (Token.ClosedParenthesis, ys) with
                     | Error e -> Error e
                     | Ok(_, ks) -> Ok(f, ks)
 

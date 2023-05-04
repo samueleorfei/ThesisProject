@@ -7,19 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="./src/Models/Formula/Formula.fsi" />
-    <Compile Include="./src/Models/Formula/Formula.fs" />
+    <Compile Include="./src/Models/Domain.fs" />
 
+    <Compile Include="./src/Models/Token/Token.fsi" />
     <Compile Include="./src/Models/Token/Token.fs" />
 
-    <Compile Include="./src/Models/Operation.fs" />
-
-    <Compile Include="./src/Utils/Word.fs" />
+    <Compile Include="./src/Models/Formula/Formula.fsi" />
+    <Compile Include="./src/Models/Formula/Formula.fs" />
 
     <Compile Include="./src/Lexer/Lexer.fsi" />
     <Compile Include="./src/Lexer/Lexer.fs" />
 
+    <Compile Include="./src/Parser/Parser.fsi" />
     <Compile Include="./src/Parser/Parser.fs" />
+
+    <Compile Include="./src/Utils/Word.fs" />
 
     <Compile Include="Program.fs" />
   </ItemGroup>

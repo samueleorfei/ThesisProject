@@ -7,14 +7,36 @@ open Models.Types
 open System.Text.RegularExpressions
 
 module Lexer =
-    let tokenize input =
+    let tokenize (input: string) =
         let scanner (input: string) : string list =
-            let rec split (slice: string, rule: string) : string list =
+            let split (slice: string, rule: string) : string =
                 match Regex.IsMatch(slice, rule) with
-                | false -> [ slice ]
-                | _ -> Regex.Split(slice, rule) |> Array.toList
+                | false -> slice
+                | _ ->
+                    let matches =
+                        Regex.Matches(slice, rule)
+                        |> Seq.cast
+                        |> List.ofSeq
+                        |> List.map (fun x -> string (x))
 
-            split (input, Token.rule (TokenType.Whitespace))
+                    let rec change (matches, input: string) =
+                        match matches with
+                        | [] -> input
+                        | m :: ms -> change (ms, input.Replace(m, m + "?"))
+
+                    change (matches, slice)
+
+            let rec splitByRules (result: string, rules: TokenType list) =
+                match rules with
+                | [] -> result
+                | r :: rs ->
+                    let accumulator: string = split (result, Token.rule r)
+
+                    splitByRules (accumulator, rs)
+
+            (splitByRules (input, Token.types ())).Split([| '?' |])
+            |> Array.toList
+            |> List.filter (fun x -> x <> "" && x <> " ")
 
         let evaluator (input: string list, keys: TokenType list) : Token<'T> list =
             let transform (input: string, keys: TokenType list) : Token<'T> =

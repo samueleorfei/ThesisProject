@@ -73,4 +73,4 @@ module Token =
         | Whitespace -> " "
         | OpenParenthesis -> "("
         | ClosedParenthesis -> ")"
-        | Identifier x -> string (x)
+        | Identifier (x: 'T) -> string (x)

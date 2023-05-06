@@ -8,9 +8,9 @@ module Parser =
     let parse (tokens: Token<string> list) =
         let constParser c tokens = Ok(c, tokens)
 
-        let parseIdentifier tokens =
+        let parseIdentifier (tokens: Token<'T> list) =
             match tokens with
-            | (Token.Identifier x) :: tail -> Ok(x, tail)
+            | (Identifier x) :: tail -> Ok(x, tail)
             | first :: _ -> Error $"expected an identifier, got {first}"
             | [] -> Error $"expected an identifier, got EOF"
 
@@ -39,24 +39,24 @@ module Parser =
                 match tokens with
                 | x :: _ ->
                     match parseToken (x, tokens) with
-                    | Error e -> Error e
-                    | Ok(op, ys) ->
+                    | Error (e: string) -> Error e
+                    | Ok(op: Token<'T>, ys: Token<'T> list) ->
                         match parseExpression ys with
-                        | Error e -> Error e
-                        | Ok(k, ks) ->
+                        | Error (e: string) -> Error e
+                        | Ok(k: AST<'T>, ks: Token<'T> list) ->
                             match op with
                             | Token.Not -> Ok(Not(k), ks)
                             | _ -> Error $"expected an unary operator, got {op}"
                 | [] -> Error $"expected an unary operator, got EOF"
-            | Ok(x, xs) ->
+            | Ok(x: AST<'T>, xs: Token<'T> list) ->
                 match xs with
                 | op :: _ ->
                     match parseToken (op, xs) with
-                    | Error e -> Error e
-                    | Ok(operator, ls) ->
+                    | Error (e: string) -> Error e
+                    | Ok(operator: Token<'T>, ls: Token<'T> list) ->
                         match parseExpression ls with
-                        | Error e -> Error e
-                        | Ok(k, ks) ->
+                        | Error (e: string) -> Error e
+                        | Ok(k: AST<'T>, ks: Token<'T> list) ->
                             match operator with
                             | Token.And -> Ok(And(x, k), ks)
                             | Token.Or -> Ok(Or(x, k), ks)
@@ -67,15 +67,15 @@ module Parser =
                 | [] -> Error $"expected a binary operator, got EOF"
 
         and parseParenthesis (tokens: Token<'T> list) =
-            match parseToken (Token.OpenParenthesis, tokens) with
-            | Error e -> Error e
-            | Ok(x, xs) ->
+            match parseToken (OpenParenthesis, tokens) with
+            | Error (e: string) -> Error e
+            | Ok(_, xs: Token<'T> list) ->
                 match parseExpression (xs) with
-                | Error e -> Error e
-                | Ok(f, ys) ->
-                    match parseToken (Token.ClosedParenthesis, ys) with
-                    | Error e -> Error e
-                    | Ok(_, ks) -> Ok(f, ks)
+                | Error (e: string) -> Error e
+                | Ok(f: AST<'T>, ys: Token<'T> list) ->
+                    match parseToken (ClosedParenthesis, ys) with
+                    | Error (e: string) -> Error e
+                    | Ok(_, ks: Token<'T> list) -> Ok(f, ks)
 
         and parseTerm =
             parseParenthesis <|> (parseIdentifier >>= fun x -> constParser (Atom x))

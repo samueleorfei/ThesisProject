@@ -56,9 +56,45 @@ module Formula =
     ///
     /// **Returns**
     ///
-    /// - <code>AST<'T> list</code>
+    /// - <code>AST<string> list</code>
     ///
     val subFormulas: AST<string> -> AST<string> list
+
+    ///
+    /// Questa funzione prende in input una formula e la sua lista di sotto-formule e restituisce solamente quelle che fanno parte della sua chiusura positiva.
+    ///
+    /// ---
+    ///
+    /// **Parameters**
+    ///
+    /// - <code>AST<string></code> expression
+    /// - <code>AST<string> list</code> subformulas
+    ///
+    /// ---
+    ///
+    /// **Returns**
+    ///
+    /// - <code>AST<string> list</code>
+    ///
+    val positiveClosures: AST<string> * AST<string> list -> AST<string> list
+
+    ///
+    /// Questa funzione prende in input una formula e la sua lista di sotto-formule e restituisce solamente quelle che fanno parte della sua chiusura negativa.
+    ///
+    /// ---
+    ///
+    /// **Parameters**
+    ///
+    /// - <code>AST<string></code> expression
+    /// - <code>AST<string> list</code> subformulas
+    ///
+    /// ---
+    ///
+    /// **Returns**
+    ///
+    /// - <code>AST<string> list</code>
+    ///
+    val negativeClosures: AST<string> * AST<string> list -> AST<string> list
 
     ///
     /// Questa funzione prende in input un albero di sintassi di una espressione logica e ne restituisce una valutazione booleana delle costanti

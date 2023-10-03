@@ -2,6 +2,6 @@
 
 open Models
 
-let test = "(A & B) -> C"
+let test = "A & B -> C"
 
 printfn "%A" (Formula.parse test |> Formula.subFormulas)

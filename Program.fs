@@ -4,4 +4,4 @@ open Models
 
 let test = "A & B -> C"
 
-printfn "%A" (Formula.parse test |> Formula.subFormulas)
+printfn "%A" (Formula.parse test |> Formula.negativeClosures)

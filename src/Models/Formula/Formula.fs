@@ -37,8 +37,31 @@ module Formula =
 
         sub ast |> List.removeAt 0
 
-    let positiveClosures (ast: AST<string>, sub: AST<string> list) = sub
+    let positiveClosures (ast: AST<string>) : AST<string> list =
+        let rec closures (acc: AST<string> list, sub: AST<string> list) : AST<string> list =
+            match sub with
+            | [] -> acc
+            | x :: xs ->
+                match x with
+                | Atom(y) -> closures (acc @ [ Atom(y) ], xs)
+                | And(y, z) when y = z -> closures (acc @ [ And(y, z) ], xs)
+                | Or(y, z) -> closures (acc @ [ Or(y, z) ], xs)
+                | Imp(y, z) -> closures (acc @ [ Imp(y, z) ], xs)
+                | _ -> closures (acc, xs)
 
-    let negativeClosures (ast: AST<string>, sub: AST<string> list) = sub
+        closures ([], (subFormulas ast))
+
+    let negativeClosures (ast: AST<string>) =
+        let rec closures (acc: AST<string> list, sub: AST<string> list) : AST<string> list =
+            match sub with
+            | [] -> acc
+            | x :: xs ->
+                match x with
+                | Atom(y) -> closures (acc @ [ Atom(y) ], xs)
+                | And(y, z) -> closures (acc @ [ And(y, z) ], xs)
+                | Or(y, z) when y = z -> closures (acc @ [ Or(y, z) ], xs)
+                | _ -> closures (acc, xs)
+
+        closures ([], (subFormulas ast))
 
     let evaluate (ast: AST<'T>) = [ true ]

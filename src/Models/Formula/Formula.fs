@@ -35,7 +35,7 @@ module Formula =
             | Iff(x, y) -> [ Iff(x, y) ] @ sub (x) @ sub (y)
             | Eq(x, y) -> [ Eq(x, y) ] @ sub (x) @ sub (y)
 
-        sub ast |> List.removeAt 0
+        sub ast
 
     let positiveClosures (ast: AST<string>) : AST<string> list =
         let rec closures (acc: AST<string> list, sub: AST<string> list) : AST<string> list =

@@ -61,6 +61,40 @@ module Formula =
     val subFormulas: AST<string> -> AST<string> list
 
     ///
+    /// Questa funzione prende in input una formula e ne restituisce la lista di tutte le sue sotto-formule destre.
+    ///
+    /// ---
+    ///
+    /// **Parameters**
+    ///
+    /// - <code>AST<string></code> expression
+    ///
+    /// ---
+    ///
+    /// **Returns**
+    ///
+    /// - <code>AST<string> list</code>
+    ///
+    val rightSubformulas: AST<string> -> AST<string> list
+
+    ///
+    /// Questa funzione prende in input una formula e ne restituisce la lista di tutte le sue sotto-formule sinistre.
+    ///
+    /// ---
+    ///
+    /// **Parameters**
+    ///
+    /// - <code>AST<string></code> expression
+    ///
+    /// ---
+    ///
+    /// **Returns**
+    ///
+    /// - <code>AST<string> list</code>
+    ///
+    val leftSubformulas: AST<string> -> AST<string> list
+
+    ///
     /// Questa funzione prende in input una formula e restituisce solamente le sotto-formule che fanno parte della sua chiusura positiva.
     ///
     /// ---

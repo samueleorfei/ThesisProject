@@ -2,6 +2,6 @@
 
 open Models
 
-let test = "A & B -> C"
+let test = "(B -> C) & A"
 
-printfn "%A" (Formula.parse test |> Formula.negativeClosures)
+printfn "%A" (Formula.parse test |> Formula.leftSubformulas)

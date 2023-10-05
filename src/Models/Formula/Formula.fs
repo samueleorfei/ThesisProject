@@ -22,20 +22,53 @@ module Formula =
         | Ok(ast, _) -> ast
         | Error(e) -> failwith e
 
-    let subFormulas (ast: AST<string>) : AST<string> list =
-        let rec sub (f: AST<string>) =
-            match f with
-            | True -> [ True ]
-            | False -> [ False ]
-            | Atom(x) -> [ Atom(x) ]
-            | Not(x) -> [ Not(x) ] @ sub (x)
-            | And(x, y) -> [ And(x, y) ] @ sub (x) @ sub (y)
-            | Or(x, y) -> [ Or(x, y) ] @ sub (x) @ sub (y)
-            | Imp(x, y) -> [ Imp(x, y) ] @ sub (x) @ sub (y)
-            | Iff(x, y) -> [ Iff(x, y) ] @ sub (x) @ sub (y)
-            | Eq(x, y) -> [ Eq(x, y) ] @ sub (x) @ sub (y)
+    let rec subFormulas (ast: AST<string>) : AST<string> list =
+        match ast with
+        | True -> [ True ]
+        | False -> [ False ]
+        | Atom(x) -> [ Atom(x) ]
+        | Not(x) -> [ Not(x) ] @ subFormulas (x)
+        | And(x, y) -> [ And(x, y) ] @ subFormulas (x) @ subFormulas (y)
+        | Or(x, y) -> [ Or(x, y) ] @ subFormulas (x) @ subFormulas (y)
+        | Imp(x, y) -> [ Imp(x, y) ] @ subFormulas (x) @ subFormulas (y)
+        | Iff(x, y) -> [ Iff(x, y) ] @ subFormulas (x) @ subFormulas (y)
+        | Eq(x, y) -> [ Eq(x, y) ] @ subFormulas (x) @ subFormulas (y)
 
-        sub ast
+    let rightSubformulas (ast: AST<string>) =
+        let rec sub (acc: AST<string> list, sf: AST<string> list, last: AST<string>) =
+            match sf with
+            | [] -> acc
+            | x :: xs ->
+                match x with
+                | _ when x = ast -> sub (acc @ [ x ], xs, x)
+                | _ ->
+                    match last with
+                    | Imp(y, z) -> sub (acc @ [ y ], xs, y)
+                    | And(y, z) -> sub (acc @ [ z ], xs, z)
+                    | Or(y, z) -> sub (acc @ [ z ], xs, z)
+                    | Iff(y, z) -> sub (acc @ [ z ], xs, z)
+                    | Eq(y, z) -> sub (acc @ [ z ], xs, z)
+                    | _ -> sub (acc, xs, x)
+
+        sub ([], (subFormulas ast), ast)
+
+    let leftSubformulas (ast: AST<string>) =
+        let rec sub (acc: AST<string> list, sf: AST<string> list, last: AST<string>) =
+            match sf with
+            | [] -> acc
+            | x :: xs ->
+                match x with
+                | _ when x = ast -> sub (acc, xs, x)
+                | _ ->
+                    match last with
+                    | Imp(y, z) -> sub (acc @ [ z ], xs, z)
+                    | And(y, z) -> sub (acc @ [ y ], xs, y)
+                    | Or(y, z) -> sub (acc @ [ y ], xs, y)
+                    | Iff(y, z) -> sub (acc @ [ y ], xs, y)
+                    | Eq(y, z) -> sub (acc @ [ y ], xs, y)
+                    | _ -> sub (acc, xs, x)
+
+        sub ([], (subFormulas ast), ast)
 
     let positiveClosures (ast: AST<string>) : AST<string> list =
         let rec closures (acc: AST<string> list, sub: AST<string> list) : AST<string> list =
@@ -52,8 +85,8 @@ module Formula =
         closures ([], (subFormulas ast))
 
     let negativeClosures (ast: AST<string>) =
-        let rec closures (acc: AST<string> list, sub: AST<string> list) : AST<string> list =
-            match sub with
+        let rec closures (acc: AST<string> list, subFormulas: AST<string> list) : AST<string> list =
+            match subFormulas with
             | [] -> acc
             | x :: xs ->
                 match x with

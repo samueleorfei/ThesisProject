@@ -26,6 +26,9 @@
 
     <Compile Include="./src/Utils/Word.fs" />
 
+    <Compile Include="./src/Algorithm/Algorithm.fsi" />
+    <Compile Include="./src/Algorithm/Algorithm.fs" />
+
     <Compile Include="Program.fs" />
   </ItemGroup>
 

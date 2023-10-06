@@ -1,6 +1,7 @@
 namespace Models
 
 open Models.Types
+open System.IO
 open Lexing
 open Parsing
 
@@ -33,6 +34,9 @@ module Formula =
         match Lexer.tokenize input |> Parser.parse with
         | Ok(ast, _) -> ast
         | Error(e) -> failwith e
+
+    let fromFile (path: string) : AST<string> list =
+        File.ReadLines(path) |> Seq.map parse |> Seq.toList
 
     let rec subFormulas (ast: AST<string>) : AST<string> list =
         match ast with

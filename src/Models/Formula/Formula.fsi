@@ -44,6 +44,24 @@ module Formula =
     val toBinaryTree: AST<'T> -> Tree<AST<'T>>
 
     ///
+    /// Questa funzione prende in input una path di un file e restituisce una lista di formule sotto forma di
+    /// **AST<'T>** risultate dall'interpretazione del contenuto dei file di input
+    ///
+    /// ---
+    ///
+    /// **Parameters**
+    ///
+    /// - <code>string</code> path
+    ///
+    /// ---
+    ///
+    /// **Return**
+    ///
+    /// - <code>AST<'T> list</code>
+    ///
+    val fromFile: string -> AST<string> list
+
+    ///
     /// Questa funzione prende in input un argomento generico rappresentante una qualsiasi espressione logica
     /// e resituisce il suo albero di sintassi.
     ///

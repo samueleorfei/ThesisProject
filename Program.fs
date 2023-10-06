@@ -2,6 +2,10 @@
 
 open Models
 
-let test = "(B -> C) & A"
+let goalPath = "./src/Input/Goal.txt"
+let premisesPath = "./src/Input/Premises.txt"
 
-printfn "%A" (Formula.parse test |> Formula.toString)
+let goal = List.item 0 (Formula.fromFile goalPath)
+let premises = Formula.fromFile premisesPath
+
+printfn "%A" (goal)

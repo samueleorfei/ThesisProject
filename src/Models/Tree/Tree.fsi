@@ -2,6 +2,9 @@ namespace Models
 
 open Models.Types
 
+///
+/// Il _modulo_ <code>Tree</code> contiene la definizione delle funzioni per l'attraversamento di un albero binario.
+///
 module Tree =
     ///
     /// Questa funzione prende in input un albero binario di ricerca <code>Tree<'T></code> e restituisce una lista

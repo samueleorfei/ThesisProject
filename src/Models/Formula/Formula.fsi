@@ -26,6 +26,24 @@ module Formula =
     val toString: AST<'T> -> string
 
     ///
+    /// Questa funzione prende in input un albero di sintassi generico <code>AST<'T></code> e restituisce l'espressione
+    /// logica che esso rappresenta sotto forma di albero binario di ricerca.
+    ///
+    /// ---
+    ///
+    /// **Parameters**
+    ///
+    /// - <code>AST<'T></code> ast
+    ///
+    /// ---
+    ///
+    /// **Return**
+    ///
+    /// - <code>Tree<AST<'T>></code>
+    ///
+    val toBinaryTree: AST<'T> -> Tree<AST<'T>>
+
+    ///
     /// Questa funzione prende in input un argomento generico rappresentante una qualsiasi espressione logica
     /// e resituisce il suo albero di sintassi.
     ///

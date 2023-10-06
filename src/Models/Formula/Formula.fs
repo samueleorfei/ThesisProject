@@ -17,6 +17,18 @@ module Formula =
         | Iff(x: AST<'T>, y: AST<'T>) -> $"({toString (x)} <-> {toString (y)})"
         | Eq(x: AST<'T>, y: AST<'T>) -> $"({toString (x)} = {toString (y)})"
 
+    let rec toBinaryTree (ast: AST<'T>) : Tree<AST<'T>> =
+        match ast with
+        | True -> Node(True, Null, Null)
+        | False -> Node(False, Null, Null)
+        | Atom(x: 'T) -> Node(Atom x, Null, Null)
+        | Not(x: AST<'T>) -> Node(Not x, toBinaryTree x, Null)
+        | And(x: AST<'T>, y: AST<'T>) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
+        | Or(x: AST<'T>, y: AST<'T>) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
+        | Imp(x: AST<'T>, y: AST<'T>) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
+        | Iff(x: AST<'T>, y: AST<'T>) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
+        | Eq(x: AST<'T>, y: AST<'T>) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
+
     let parse (input: string) =
         match Lexer.tokenize input |> Parser.parse with
         | Ok(ast, _) -> ast

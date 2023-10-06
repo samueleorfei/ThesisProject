@@ -31,3 +31,7 @@ module Types =
         | Imp of AST<'T> * AST<'T>
         | Iff of AST<'T> * AST<'T>
         | Eq of AST<'T> * AST<'T>
+
+    type Tree<'T> =
+        | Null
+        | Node of 'T * Tree<'T> * Tree<'T>

@@ -18,6 +18,9 @@
     <Compile Include="./src/Parser/Parser.fsi" />
     <Compile Include="./src/Parser/Parser.fs" />
 
+    <Compile Include="./src/Models/Tree/Tree.fsi" />
+    <Compile Include="./src/Models/Tree/Tree.fs" />
+
     <Compile Include="./src/Models/Formula/Formula.fsi" />
     <Compile Include="./src/Models/Formula/Formula.fs" />
 

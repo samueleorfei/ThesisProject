@@ -4,4 +4,4 @@ open Models
 
 let test = "(B -> C) & A"
 
-printfn "%A" (Formula.parse test |> Formula.leftSubformulas)
+printfn "%A" (Formula.parse test |> Formula.toString)

@@ -17,7 +17,7 @@ module Token =
     ///
     /// - <code>TokenType list</code>
     ///
-    val types: unit -> TokenType list;
+    val types: unit -> TokenType list
 
     ///
     /// Questa funzione restituisce la regola associata ad uno specifico tipo di Token.
@@ -35,7 +35,7 @@ module Token =
     ///
     /// - <code>string</code>
     ///
-    val rule: TokenType -> string;
+    val rule: TokenType -> string
 
     ///
     /// Questa funzione restituisce l'intera grammatica sotto forma di mappa <<code>TokenType</code>, <code>string</code>>.
@@ -51,7 +51,7 @@ module Token =
     ///
     /// - <code>Map<TokenType, string></code>
     ///
-    val grammar: unit -> Map<TokenType, string>;
+    val grammar: unit -> Map<TokenType, string>
 
     ///
     /// Questa funzione restituisce il <code>Token</code> corretto in base al tipo di carattere o stringa in input.
@@ -69,7 +69,7 @@ module Token =
     ///
     /// - <code>Token<string></code>
     ///
-    val parse: string -> Token<string>;
+    val parse: string -> Token<string>
 
     ///
     /// Questa funzione restituisce la stringa corrispondente al <code>Token</code> in input.
@@ -79,7 +79,7 @@ module Token =
     ///
     /// **Parameters**
     ///
-    /// - <code>Token<'T></code> token
+    /// - <code>Token<string></code> token
     ///
     /// ---
     ///
@@ -87,4 +87,4 @@ module Token =
     ///
     /// - <code>string</code>
     ///
-    val toString: Token<'T> -> string;
+    val toString: Token<string> -> string

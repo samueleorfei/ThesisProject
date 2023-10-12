@@ -38,8 +38,8 @@ module Lexer =
             |> Array.toList
             |> List.filter (fun x -> x <> "" && x <> " ")
 
-        let evaluator (input: string list, keys: TokenType list) : Token<'T> list =
-            let transform (input: string, keys: TokenType list) : Token<'T> =
+        let evaluator (input: string list, keys: TokenType list) : Token<string> list =
+            let transform (input: string, keys: TokenType list) : Token<string> =
                 match List.exists (fun (k: TokenType) -> Regex.IsMatch(input, Token.rule k)) keys with
                 | false -> failwith "Input non valido"
                 | _ ->

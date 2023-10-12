@@ -62,7 +62,7 @@ module Token =
         | "\s" -> Whitespace
         | _ -> Identifier input
 
-    let toString (token: Token<'T>) =
+    let toString (token: Token<string>) =
         match token with
         | Token.Not -> "--"
         | Token.And -> "&"
@@ -73,4 +73,4 @@ module Token =
         | Whitespace -> " "
         | OpenParenthesis -> "("
         | ClosedParenthesis -> ")"
-        | Identifier (x: 'T) -> string (x)
+        | Identifier(x: string) -> string (x)

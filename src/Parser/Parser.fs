@@ -43,12 +43,12 @@ module Parser =
                     | Ok(op: Token<string>, ys: Token<string> list) ->
                         match parseExpression ys with
                         | Error(e: string) -> Error e
-                        | Ok(k: AST<string>, ks: Token<string> list) ->
+                        | Ok(k: AST, ks: Token<string> list) ->
                             match op with
                             | Token.Not -> Ok(Not(k), ks)
                             | _ -> Error $"expected an unary operator, got {op}"
                 | [] -> Error $"expected an unary operator, got EOF"
-            | Ok(x: AST<string>, xs: Token<string> list) ->
+            | Ok(x: AST, xs: Token<string> list) ->
                 match xs with
                 | op :: _ ->
                     match parseToken (op, xs) with
@@ -56,7 +56,7 @@ module Parser =
                     | Ok(operator: Token<string>, ls: Token<string> list) ->
                         match parseExpression ls with
                         | Error(e: string) -> Error e
-                        | Ok(k: AST<string>, ks: Token<string> list) ->
+                        | Ok(k: AST, ks: Token<string> list) ->
                             match operator with
                             | Token.And -> Ok(And(x, k), ks)
                             | Token.Or -> Ok(Or(x, k), ks)
@@ -72,7 +72,7 @@ module Parser =
             | Ok(_, xs: Token<string> list) ->
                 match parseExpression (xs) with
                 | Error(e: string) -> Error e
-                | Ok(f: AST<string>, ys: Token<string> list) ->
+                | Ok(f: AST, ys: Token<string> list) ->
                     match parseToken (ClosedParenthesis, ys) with
                     | Error(e: string) -> Error e
                     | Ok(_, ks: Token<string> list) -> Ok(f, ks)

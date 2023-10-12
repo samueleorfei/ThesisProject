@@ -8,4 +8,4 @@ let premisesPath = "./src/Input/Premises.txt"
 let goal = List.item 0 (Formula.fromFile goalPath)
 let premises = Formula.fromFile premisesPath
 
-printfn "%A" (goal)
+printfn "%A" (Formula.subFormulas goal)

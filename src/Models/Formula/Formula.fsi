@@ -8,14 +8,14 @@ open Models.Types
 ///
 module Formula =
     ///
-    /// Questa funzione prende in input un albero di sintassi generico <code>AST<'T></code> e restituisce l'espressione
+    /// Questa funzione prende in input un albero di sintassi generico <code>AST</code> e restituisce l'espressione
     /// logica che esso rappresenta sotto forma di stringa.
     ///
     /// ---
     ///
     /// **Parameters**
     ///
-    /// - <code>AST<'T></code> ast
+    /// - <code>AST</code> ast
     ///
     /// ---
     ///
@@ -23,29 +23,29 @@ module Formula =
     ///
     /// - <code>string</code>
     ///
-    val toString: AST<'T> -> string
+    val toString: AST -> string
 
     ///
-    /// Questa funzione prende in input un albero di sintassi generico <code>AST<'T></code> e restituisce l'espressione
+    /// Questa funzione prende in input un albero di sintassi generico <code>AST</code> e restituisce l'espressione
     /// logica che esso rappresenta sotto forma di albero binario di ricerca.
     ///
     /// ---
     ///
     /// **Parameters**
     ///
-    /// - <code>AST<'T></code> ast
+    /// - <code>AST</code> ast
     ///
     /// ---
     ///
     /// **Return**
     ///
-    /// - <code>Tree<AST<'T>></code>
+    /// - <code>Tree<AST></code>
     ///
-    val toBinaryTree: AST<'T> -> Tree<AST<'T>>
+    val toBinaryTree: AST -> Tree<AST>
 
     ///
     /// Questa funzione prende in input una path di un file e restituisce una lista di formule sotto forma di
-    /// **AST<'T>** risultate dall'interpretazione del contenuto dei file di input
+    /// **AST** risultate dall'interpretazione del contenuto dei file di input
     ///
     /// ---
     ///
@@ -57,9 +57,9 @@ module Formula =
     ///
     /// **Return**
     ///
-    /// - <code>AST<'T> list</code>
+    /// - <code>AST list</code>
     ///
-    val fromFile: string -> AST<string> list
+    val fromFile: string -> AST list
 
     ///
     /// Questa funzione prende in input un argomento generico rappresentante una qualsiasi espressione logica
@@ -69,15 +69,15 @@ module Formula =
     ///
     /// **Parameters**
     ///
-    /// - <code>'T</code> expression
+    /// - <code>string</code> expression
     ///
     /// ---
     ///
     /// **Returns**
     ///
-    /// - <code>AST<'T></code>
+    /// - <code>AST</code>
     ///
-    val parse: string -> AST<string>
+    val parse: string -> AST
 
     ///
     /// Questa funzione prende in input una formula e ne restituisce la lista di tutte le sue sotto-formule.
@@ -86,83 +86,15 @@ module Formula =
     ///
     /// **Parameters**
     ///
-    /// - <code>AST<string></code> expression
+    /// - <code>AST</code> expression
     ///
     /// ---
     ///
     /// **Returns**
     ///
-    /// - <code>AST<string> list</code>
+    /// - <code>AST list</code>
     ///
-    val subFormulas: AST<string> -> AST<string> list
-
-    ///
-    /// Questa funzione prende in input una formula e ne restituisce la lista di tutte le sue sotto-formule destre.
-    ///
-    /// ---
-    ///
-    /// **Parameters**
-    ///
-    /// - <code>AST<string></code> expression
-    ///
-    /// ---
-    ///
-    /// **Returns**
-    ///
-    /// - <code>AST<string> list</code>
-    ///
-    val rightSubformulas: AST<string> -> AST<string> list
-
-    ///
-    /// Questa funzione prende in input una formula e ne restituisce la lista di tutte le sue sotto-formule sinistre.
-    ///
-    /// ---
-    ///
-    /// **Parameters**
-    ///
-    /// - <code>AST<string></code> expression
-    ///
-    /// ---
-    ///
-    /// **Returns**
-    ///
-    /// - <code>AST<string> list</code>
-    ///
-    val leftSubformulas: AST<string> -> AST<string> list
-
-    ///
-    /// Questa funzione prende in input una formula e restituisce solamente le sotto-formule che fanno parte della sua chiusura positiva.
-    ///
-    /// ---
-    ///
-    /// **Parameters**
-    ///
-    /// - <code>AST<string></code> expression
-    ///
-    /// ---
-    ///
-    /// **Returns**
-    ///
-    /// - <code>AST<string> list</code>
-    ///
-    val positiveClosures: AST<string> -> AST<string> list
-
-    ///
-    /// Questa funzione prende in input una formula e restituisce solamente le sotto-formule che fanno parte della sua chiusura negativa.
-    ///
-    /// ---
-    ///
-    /// **Parameters**
-    ///
-    /// - <code>AST<string></code> expression
-    ///
-    /// ---
-    ///
-    /// **Returns**
-    ///
-    /// - <code>AST<string> list</code>
-    ///
-    val negativeClosures: AST<string> -> AST<string> list
+    val subFormulas: AST -> AST list * AST list
 
     ///
     /// Questa funzione prende in input un albero di sintassi di una espressione logica e ne restituisce una valutazione booleana delle costanti
@@ -172,7 +104,7 @@ module Formula =
     ///
     /// **Parameters**
     ///
-    /// - <code>AST<'T></code> ast
+    /// - <code>AST</code> ast
     ///
     /// ---
     ///
@@ -180,4 +112,4 @@ module Formula =
     ///
     /// - <code>bool list</code>
     ///
-    val evaluate: AST<'T> -> bool list
+    val evaluate: AST -> bool list

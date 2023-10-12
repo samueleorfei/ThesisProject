@@ -21,16 +21,16 @@ module Types =
         | Iff
         | Eq
 
-    type AST<'T> =
+    type AST =
         | True
         | False
-        | Atom of 'T
-        | Not of AST<'T>
-        | And of AST<'T> * AST<'T>
-        | Or of AST<'T> * AST<'T>
-        | Imp of AST<'T> * AST<'T>
-        | Iff of AST<'T> * AST<'T>
-        | Eq of AST<'T> * AST<'T>
+        | Atom of string
+        | Not of AST
+        | And of AST * AST
+        | Or of AST * AST
+        | Imp of AST * AST
+        | Iff of AST * AST
+        | Eq of AST * AST
 
     type Tree<'T> =
         | Null

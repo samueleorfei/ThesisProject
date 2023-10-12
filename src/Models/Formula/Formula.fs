@@ -6,111 +6,87 @@ open Lexing
 open Parsing
 
 module Formula =
-    let rec toString (ast: AST<'T>) : string =
+    let rec toString (ast: AST) : string =
         match ast with
         | True -> "T"
         | False -> "F"
-        | Atom(x: 'T) -> $"{x}"
-        | Not(x: AST<'T>) -> $"-{toString (x)}"
-        | And(x: AST<'T>, y: AST<'T>) -> $"({toString (x)} && {toString (y)})"
-        | Or(x: AST<'T>, y: AST<'T>) -> $"({toString (x)} || {toString (y)})"
-        | Imp(x: AST<'T>, y: AST<'T>) -> $"({toString (x)} -> {toString (y)})"
-        | Iff(x: AST<'T>, y: AST<'T>) -> $"({toString (x)} <-> {toString (y)})"
-        | Eq(x: AST<'T>, y: AST<'T>) -> $"({toString (x)} = {toString (y)})"
+        | Atom(x: string) -> $"{x}"
+        | Not(x: AST) -> $"-{toString (x)}"
+        | And(x: AST, y: AST) -> $"({toString (x)} && {toString (y)})"
+        | Or(x: AST, y: AST) -> $"({toString (x)} || {toString (y)})"
+        | Imp(x: AST, y: AST) -> $"({toString (x)} -> {toString (y)})"
+        | Iff(x: AST, y: AST) -> $"({toString (x)} <-> {toString (y)})"
+        | Eq(x: AST, y: AST) -> $"({toString (x)} = {toString (y)})"
 
-    let rec toBinaryTree (ast: AST<'T>) : Tree<AST<'T>> =
+    let rec toBinaryTree (ast: AST) : Tree<AST> =
         match ast with
         | True -> Node(True, Null, Null)
         | False -> Node(False, Null, Null)
-        | Atom(x: 'T) -> Node(Atom x, Null, Null)
-        | Not(x: AST<'T>) -> Node(Not x, toBinaryTree x, Null)
-        | And(x: AST<'T>, y: AST<'T>) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
-        | Or(x: AST<'T>, y: AST<'T>) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
-        | Imp(x: AST<'T>, y: AST<'T>) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
-        | Iff(x: AST<'T>, y: AST<'T>) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
-        | Eq(x: AST<'T>, y: AST<'T>) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
+        | Atom(x: string) -> Node(Atom x, Null, Null)
+        | Not(x: AST) -> Node(Not x, toBinaryTree x, Null)
+        | And(x: AST, y: AST) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
+        | Or(x: AST, y: AST) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
+        | Imp(x: AST, y: AST) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
+        | Iff(x: AST, y: AST) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
+        | Eq(x: AST, y: AST) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
 
     let parse (input: string) =
         match Lexer.tokenize input |> Parser.parse with
         | Ok(ast, _) -> ast
         | Error(e) -> failwith e
 
-    let fromFile (path: string) : AST<string> list =
+    let fromFile (path: string) : AST list =
         File.ReadLines(path) |> Seq.map parse |> Seq.toList
 
-    let rec subFormulas (ast: AST<string>) : AST<string> list =
-        match ast with
-        | True -> [ True ]
-        | False -> [ False ]
-        | Atom(x) -> [ Atom(x) ]
-        | Not(x) -> [ Not(x) ] @ subFormulas (x)
-        | And(x, y) -> [ And(x, y) ] @ subFormulas (x) @ subFormulas (y)
-        | Or(x, y) -> [ Or(x, y) ] @ subFormulas (x) @ subFormulas (y)
-        | Imp(x, y) -> [ Imp(x, y) ] @ subFormulas (x) @ subFormulas (y)
-        | Iff(x, y) -> [ Iff(x, y) ] @ subFormulas (x) @ subFormulas (y)
-        | Eq(x, y) -> [ Eq(x, y) ] @ subFormulas (x) @ subFormulas (y)
+    let subFormulas (ast: AST) =
+        let rec sub (left: Set<AST>, right: Set<AST>, f: AST, isRight: bool) =
+            match f with
+            | True
+            | False
+            | Atom(_) ->
+                match isRight with
+                | true -> (left, (Set.add f right))
+                | false -> ((Set.add f left), right)
+            | Not(x) ->
+                match isRight with
+                | true ->
+                    let (l, r) = sub (left, (Set.add x right), x, isRight)
 
-    let rightSubformulas (ast: AST<string>) =
-        let rec sub (acc: AST<string> list, sf: AST<string> list, last: AST<string>) =
-            match sf with
-            | [] -> acc
-            | x :: xs ->
-                match x with
-                | _ when x = ast -> sub (acc @ [ x ], xs, x)
-                | _ ->
-                    match last with
-                    | Imp(y, z) -> sub (acc @ [ y ], xs, y)
-                    | And(y, z) -> sub (acc @ [ z ], xs, z)
-                    | Or(y, z) -> sub (acc @ [ z ], xs, z)
-                    | Iff(y, z) -> sub (acc @ [ z ], xs, z)
-                    | Eq(y, z) -> sub (acc @ [ z ], xs, z)
-                    | _ -> sub (acc, xs, x)
+                    (l, (Set.add f r))
+                | false ->
+                    let (l, r) = sub ((Set.add x left), right, x, isRight)
 
-        sub ([], (subFormulas ast), ast)
+                    ((Set.add f l), r)
+            | And(x, y)
+            | Or(x, y) ->
+                match isRight with
+                | true ->
+                    let (fl, fr) = sub (left, (Set.add x right), x, isRight)
+                    let (sl, sr) = sub (left, (Set.add y right), y, isRight)
 
-    let leftSubformulas (ast: AST<string>) =
-        let rec sub (acc: AST<string> list, sf: AST<string> list, last: AST<string>) =
-            match sf with
-            | [] -> acc
-            | x :: xs ->
-                match x with
-                | _ when x = ast -> sub (acc, xs, x)
-                | _ ->
-                    match last with
-                    | Imp(y, z) -> sub (acc @ [ z ], xs, z)
-                    | And(y, z) -> sub (acc @ [ y ], xs, y)
-                    | Or(y, z) -> sub (acc @ [ y ], xs, y)
-                    | Iff(y, z) -> sub (acc @ [ y ], xs, y)
-                    | Eq(y, z) -> sub (acc @ [ y ], xs, y)
-                    | _ -> sub (acc, xs, x)
+                    ((Set.union fl sl), (Set.add f (Set.union fr sr)))
+                | false ->
+                    let (fl, fr) = sub ((Set.add x left), right, x, isRight)
+                    let (sl, sr) = sub ((Set.add y left), right, y, isRight)
 
-        sub ([], (subFormulas ast), ast)
+                    ((Set.add f (Set.union fl sl)), (Set.union fr sr))
+            | Imp(x, y)
+            | Iff(x, y)
+            | Eq(x, y) ->
+                match isRight with
+                | true ->
+                    let (fl, fr) = sub (left, (Set.add y right), y, isRight)
+                    let (sl, sr) = sub ((Set.add x left), right, x, false)
 
-    let positiveClosures (ast: AST<string>) : AST<string> list =
-        let rec closures (acc: AST<string> list, sub: AST<string> list) : AST<string> list =
-            match sub with
-            | [] -> acc
-            | x :: xs ->
-                match x with
-                | Atom(y) -> closures (acc @ [ Atom(y) ], xs)
-                | And(y, z) when y = z -> closures (acc @ [ And(y, z) ], xs)
-                | Or(y, z) -> closures (acc @ [ Or(y, z) ], xs)
-                | Imp(y, z) -> closures (acc @ [ Imp(y, z) ], xs)
-                | _ -> closures (acc, xs)
+                    ((Set.union fl sl), (Set.add f (Set.union fr sr)))
+                | false ->
+                    let (fl, fr) = sub ((Set.add x left), right, x, isRight)
+                    let (sl, sr) = sub (left, (Set.add y right), y, true)
 
-        closures ([], (subFormulas ast))
+                    ((Set.add f (Set.union fl sl)), (Set.union fr sr))
 
-    let negativeClosures (ast: AST<string>) =
-        let rec closures (acc: AST<string> list, subFormulas: AST<string> list) : AST<string> list =
-            match subFormulas with
-            | [] -> acc
-            | x :: xs ->
-                match x with
-                | Atom(y) -> closures (acc @ [ Atom(y) ], xs)
-                | And(y, z) -> closures (acc @ [ And(y, z) ], xs)
-                | Or(y, z) when y = z -> closures (acc @ [ Or(y, z) ], xs)
-                | _ -> closures (acc, xs)
+        let (left, right) = sub (Set.empty, Set.empty, ast, true)
 
-        closures ([], (subFormulas ast))
+        ((Set.toList left), Set.toList right)
 
-    let evaluate (ast: AST<'T>) = [ true ]
+    let evaluate (ast: AST) = [ true ]

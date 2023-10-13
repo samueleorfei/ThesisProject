@@ -5,7 +5,10 @@ open Models
 let goalPath = "./src/Input/Goal.txt"
 let premisesPath = "./src/Input/Premises.txt"
 
-let goal = List.item 0 (Formula.fromFile goalPath)
-let premises = Formula.fromFile premisesPath
+let goal = List.item 0 (Expression.fromFile goalPath)
+let premises = Expression.fromFile premisesPath
 
-printfn "%A" (Formula.subFormulas goal)
+let (sl, sr) = Expression.subFormulas goal
+
+printfn "%A" (sl)
+printfn "%A" (sr)

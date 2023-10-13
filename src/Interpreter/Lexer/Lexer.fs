@@ -1,8 +1,6 @@
-namespace Lexing
+namespace Interpreter
 
-open Models
-open Models.Enums
-open Models.Types
+open Interpreter.Types
 
 open System.Text.RegularExpressions
 

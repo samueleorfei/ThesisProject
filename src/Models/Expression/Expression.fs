@@ -1,45 +1,44 @@
 namespace Models
 
-open Models.Types
 open System.IO
-open Lexing
-open Parsing
 
-module Formula =
-    let rec toString (ast: AST) : string =
-        match ast with
+open Models.Types
+
+open Interpreter
+
+module Expression =
+    let rec toString (f: Formula) : string =
+        match f with
         | True -> "T"
         | False -> "F"
         | Atom(x: string) -> $"{x}"
-        | Not(x: AST) -> $"-{toString (x)}"
-        | And(x: AST, y: AST) -> $"({toString (x)} && {toString (y)})"
-        | Or(x: AST, y: AST) -> $"({toString (x)} || {toString (y)})"
-        | Imp(x: AST, y: AST) -> $"({toString (x)} -> {toString (y)})"
-        | Iff(x: AST, y: AST) -> $"({toString (x)} <-> {toString (y)})"
-        | Eq(x: AST, y: AST) -> $"({toString (x)} = {toString (y)})"
+        | Not(x: Formula) -> $"-{toString (x)}"
+        | And(x: Formula, y: Formula) -> $"({toString (x)} && {toString (y)})"
+        | Or(x: Formula, y: Formula) -> $"({toString (x)} || {toString (y)})"
+        | Imp(x: Formula, y: Formula) -> $"({toString (x)} -> {toString (y)})"
+        | Iff(x: Formula, y: Formula) -> $"({toString (x)} <-> {toString (y)})"
 
-    let rec toBinaryTree (ast: AST) : Tree<AST> =
-        match ast with
+    let rec toBinaryTree (f: Formula) : Tree<Formula> =
+        match f with
         | True -> Node(True, Null, Null)
         | False -> Node(False, Null, Null)
         | Atom(x: string) -> Node(Atom x, Null, Null)
-        | Not(x: AST) -> Node(Not x, toBinaryTree x, Null)
-        | And(x: AST, y: AST) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
-        | Or(x: AST, y: AST) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
-        | Imp(x: AST, y: AST) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
-        | Iff(x: AST, y: AST) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
-        | Eq(x: AST, y: AST) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
+        | Not(x: Formula) -> Node(Not x, toBinaryTree x, Null)
+        | And(x: Formula, y: Formula) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
+        | Or(x: Formula, y: Formula) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
+        | Imp(x: Formula, y: Formula) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
+        | Iff(x: Formula, y: Formula) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
 
     let parse (input: string) =
         match Lexer.tokenize input |> Parser.parse with
-        | Ok(ast, _) -> ast
+        | Ok(f, _) -> f
         | Error(e) -> failwith e
 
-    let fromFile (path: string) : AST list =
+    let fromFile (path: string) : Formula list =
         File.ReadLines(path) |> Seq.map parse |> Seq.toList
 
-    let subFormulas (ast: AST) =
-        let rec sub (left: Set<AST>, right: Set<AST>, f: AST, isRight: bool) =
+    let subFormulas (formula: Formula) =
+        let rec sub (left: Set<Formula>, right: Set<Formula>, f: Formula, isRight: bool) =
             match f with
             | True
             | False
@@ -71,8 +70,7 @@ module Formula =
 
                     ((Set.add f (Set.union fl sl)), (Set.union fr sr))
             | Imp(x, y)
-            | Iff(x, y)
-            | Eq(x, y) ->
+            | Iff(x, y) ->
                 match isRight with
                 | true ->
                     let (fl, fr) = sub (left, (Set.add y right), y, isRight)
@@ -85,8 +83,8 @@ module Formula =
 
                     ((Set.add f (Set.union fl sl)), (Set.union fr sr))
 
-        let (left, right) = sub (Set.empty, Set.empty, ast, true)
+        let (left, right) = sub (Set.empty, Set.empty, formula, true)
 
         ((Set.toList left), Set.toList right)
 
-    let evaluate (ast: AST) = [ true ]
+    let evaluate (f: Formula) = [ true ]

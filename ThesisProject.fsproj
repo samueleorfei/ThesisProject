@@ -7,22 +7,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="./src/Models/Domain.fs" />
+    <Compile Include="./src/Interpreter/Types.fs" />
+    <Compile Include="./src/Models/Types.fs" />
 
-    <Compile Include="./src/Models/Token/Token.fsi" />
-    <Compile Include="./src/Models/Token/Token.fs" />
+    <Compile Include="./src/Interpreter/Token/Token.fsi" />
+    <Compile Include="./src/Interpreter/Token/Token.fs" />
 
-    <Compile Include="./src/Lexer/Lexer.fsi" />
-    <Compile Include="./src/Lexer/Lexer.fs" />
+    <Compile Include="./src/Interpreter/Lexer/Lexer.fsi" />
+    <Compile Include="./src/Interpreter/Lexer/Lexer.fs" />
 
-    <Compile Include="./src/Parser/Parser.fsi" />
-    <Compile Include="./src/Parser/Parser.fs" />
+    <Compile Include="./src/Interpreter/Parser/Parser.fsi" />
+    <Compile Include="./src/Interpreter/Parser/Parser.fs" />
 
     <Compile Include="./src/Models/Tree/Tree.fsi" />
     <Compile Include="./src/Models/Tree/Tree.fs" />
 
-    <Compile Include="./src/Models/Formula/Formula.fsi" />
-    <Compile Include="./src/Models/Formula/Formula.fs" />
+    <Compile Include="./src/Models/Expression/Expression.fsi" />
+    <Compile Include="./src/Models/Expression/Expression.fs" />
 
     <Compile Include="./src/Utils/Word.fs" />
 

@@ -14,12 +14,12 @@ module Algorithm =
     ///
     /// **Parameters**
     ///
-    /// - <code>AST</code> goal
-    /// - <code>AST list</code> premises
+    /// - <code>Formula</code> goal
+    /// - <code>Formula list</code> premises
     /// ---
     ///
     /// **Return**
     ///
-    /// - <code>AST list</code>
+    /// - <code>Formula list</code>
     ///
-    val calculate: AST * AST list -> AST list
+    val calculate: Formula * Formula list -> Formula list

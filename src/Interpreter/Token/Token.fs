@@ -1,7 +1,6 @@
-namespace Models
+namespace Interpreter
 
-open Models.Enums
-open Models.Types
+open Interpreter.Types
 
 module Token =
     let types =
@@ -31,16 +30,16 @@ module Token =
         | "-"
         | "--"
         | "not"
-        | "!" -> Token.Not
+        | "!" -> Not
         | "&"
         | "&&"
         | "^"
-        | "and" -> Token.And
+        | "and" -> And
         | "|"
         | "||"
         | "v"
         | "V"
-        | "or" -> Token.Or
+        | "or" -> Or
         | "("
         | "["
         | "{" -> OpenParenthesis
@@ -49,14 +48,11 @@ module Token =
         | "}" -> ClosedParenthesis
         | "->"
         | "-->"
-        | "imp" -> Token.Imp
+        | "imp" -> Imp
         | "<->"
         | "<-->"
         | "<>"
-        | "iff" -> Token.Iff
-        | "="
-        | "=="
-        | "eq" -> Token.Eq
+        | "iff" -> Iff
         | " "
         | "   "
         | "\s" -> Whitespace
@@ -64,12 +60,11 @@ module Token =
 
     let toString (token: Token<string>) =
         match token with
-        | Token.Not -> "--"
-        | Token.And -> "&"
-        | Token.Or -> "|"
-        | Token.Imp -> "->"
-        | Token.Iff -> "<->"
-        | Token.Eq -> "="
+        | Not -> "--"
+        | And -> "&"
+        | Or -> "|"
+        | Imp -> "->"
+        | Iff -> "<->"
         | Whitespace -> " "
         | OpenParenthesis -> "("
         | ClosedParenthesis -> ")"

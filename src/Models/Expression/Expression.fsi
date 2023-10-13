@@ -3,19 +3,19 @@ namespace Models
 open Models.Types
 
 ///
-/// Il _modulo_ <code>Formula</code> contiene la definizione delle funzioni per l'interpretazione o la trasformazione di
-/// un albero di sintassi per espressioni logiche (**AST**).
+/// Il _modulo_ <code>Expression</code> contiene la definizione delle funzioni per l'interpretazione o la trasformazione di
+/// un albero di sintassi per espressioni logiche (**Formula**).
 ///
-module Formula =
+module Expression =
     ///
-    /// Questa funzione prende in input un albero di sintassi generico <code>AST</code> e restituisce l'espressione
+    /// Questa funzione prende in input un albero di sintassi generico <code>Formula</code> e restituisce l'espressione
     /// logica che esso rappresenta sotto forma di stringa.
     ///
     /// ---
     ///
     /// **Parameters**
     ///
-    /// - <code>AST</code> ast
+    /// - <code>Formula</code> Formula
     ///
     /// ---
     ///
@@ -23,29 +23,29 @@ module Formula =
     ///
     /// - <code>string</code>
     ///
-    val toString: AST -> string
+    val toString: Formula -> string
 
     ///
-    /// Questa funzione prende in input un albero di sintassi generico <code>AST</code> e restituisce l'espressione
+    /// Questa funzione prende in input un albero di sintassi generico <code>Formula</code> e restituisce l'espressione
     /// logica che esso rappresenta sotto forma di albero binario di ricerca.
     ///
     /// ---
     ///
     /// **Parameters**
     ///
-    /// - <code>AST</code> ast
+    /// - <code>Formula</code> Formula
     ///
     /// ---
     ///
     /// **Return**
     ///
-    /// - <code>Tree<AST></code>
+    /// - <code>Tree<Formula></code>
     ///
-    val toBinaryTree: AST -> Tree<AST>
+    val toBinaryTree: Formula -> Tree<Formula>
 
     ///
     /// Questa funzione prende in input una path di un file e restituisce una lista di formule sotto forma di
-    /// **AST** risultate dall'interpretazione del contenuto dei file di input
+    /// **Formula** risultate dall'interpretazione del contenuto dei file di input
     ///
     /// ---
     ///
@@ -57,9 +57,9 @@ module Formula =
     ///
     /// **Return**
     ///
-    /// - <code>AST list</code>
+    /// - <code>Formula list</code>
     ///
-    val fromFile: string -> AST list
+    val fromFile: string -> Formula list
 
     ///
     /// Questa funzione prende in input un argomento generico rappresentante una qualsiasi espressione logica
@@ -75,9 +75,9 @@ module Formula =
     ///
     /// **Returns**
     ///
-    /// - <code>AST</code>
+    /// - <code>Formula</code>
     ///
-    val parse: string -> AST
+    val parse: string -> Formula
 
     ///
     /// Questa funzione prende in input una formula e ne restituisce la lista di tutte le sue sotto-formule.
@@ -86,15 +86,15 @@ module Formula =
     ///
     /// **Parameters**
     ///
-    /// - <code>AST</code> expression
+    /// - <code>Formula</code> expression
     ///
     /// ---
     ///
     /// **Returns**
     ///
-    /// - <code>AST list</code>
+    /// - <code>Formula list</code>
     ///
-    val subFormulas: AST -> AST list * AST list
+    val subFormulas: Formula -> Formula list * Formula list
 
     ///
     /// Questa funzione prende in input un albero di sintassi di una espressione logica e ne restituisce una valutazione booleana delle costanti
@@ -104,7 +104,7 @@ module Formula =
     ///
     /// **Parameters**
     ///
-    /// - <code>AST</code> ast
+    /// - <code>Formula</code> Formula
     ///
     /// ---
     ///
@@ -112,4 +112,4 @@ module Formula =
     ///
     /// - <code>bool list</code>
     ///
-    val evaluate: AST -> bool list
+    val evaluate: Formula -> bool list

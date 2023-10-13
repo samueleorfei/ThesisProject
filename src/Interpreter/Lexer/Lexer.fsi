@@ -1,6 +1,6 @@
-namespace Lexing
+namespace Interpreter
 
-open Models.Types
+open Interpreter.Types
 
 /// Il modulo Lexer contiene la definizione delle funzioni per eseguire la scansione di una
 /// stringa e la sua suddivisione in Token gestibili da un Parser.

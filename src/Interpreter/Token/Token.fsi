@@ -1,7 +1,6 @@
-namespace Models
+namespace Interpreter
 
-open Models.Enums
-open Models.Types
+open Interpreter.Types
 
 module Token =
     ///

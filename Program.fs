@@ -12,3 +12,4 @@ let (sl, sr) = Expression.subFormulas goal
 
 printfn "%A" (sl)
 printfn "%A" (sr)
+printfn "%A" (Expression.isPositiveClosure (goal, premises))

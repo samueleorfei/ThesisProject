@@ -97,6 +97,42 @@ module Expression =
     val subFormulas: Formula -> Formula list * Formula list
 
     ///
+    /// Questa funzione prende in input una formula ed un insieme di formule e restituisce se la formula rientra nelle chiusure positive dell'insieme.
+    ///
+    /// ---
+    ///
+    /// **Parameters**
+    ///
+    /// - <code>Formula</code> formula
+    /// - <code>Set of formulas</code> set
+    ///
+    /// ---
+    ///
+    /// **Returns**
+    ///
+    /// - <code>boolean</code>
+    ///
+    val isPositiveClosure: Formula * Formula list -> bool
+
+    ///
+    /// Questa funzione prende in input una formula ed un insieme di formule e restituisce se la formula rientra nelle chiusure negative dell'insieme.
+    ///
+    /// ---
+    ///
+    /// **Parameters**
+    ///
+    /// - <code>Formula</code> formula
+    /// - <code>Set of formulas</code> set
+    ///
+    /// ---
+    ///
+    /// **Returns**
+    ///
+    /// - <code>boolean</code>
+    ///
+    val isNegativeClosure: Formula * Formula list -> bool
+
+    ///
     /// Questa funzione prende in input un albero di sintassi di una espressione logica e ne restituisce una valutazione booleana delle costanti
     /// o quantificatori in esso presenti valutando, per ogni nodo, il risultato delle operazioni booleane.
     ///

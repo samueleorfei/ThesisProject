@@ -1,6 +1,7 @@
 ﻿// For more information see https://aka.ms/fsharp-console-apps
 
 open Models
+open Algorithm
 
 let goalPath = "./src/Input/Goal.txt"
 let premisesPath = "./src/Input/Premises.txt"
@@ -10,6 +11,4 @@ let premises = Expression.fromFile premisesPath
 
 let (sl, sr) = Expression.subFormulas goal
 
-printfn "%A" (sl)
-printfn "%A" (sr)
-printfn "%A" (Expression.isPositiveClosure (goal, premises))
+printfn "%A" (Calculus.generateAxioms goal)

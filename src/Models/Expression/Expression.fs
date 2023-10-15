@@ -88,23 +88,23 @@ module Expression =
         ((Set.toList left), Set.toList right)
 
     let rec isPositiveClosure (f: Formula, set: Formula list) : bool =
-        match f with
-        | True
-        | False
-        | Atom(_) -> List.contains f set
-        | And(x, y) -> isPositiveClosure (x, set) && isPositiveClosure (y, set)
-        | Or(x, y) -> isPositiveClosure (x, set) || isPositiveClosure (y, set)
-        | Imp(x, y) -> isPositiveClosure (y, set)
-        | _ -> false
+        match List.contains f set with
+        | true -> true
+        | false ->
+            match f with
+            | And(x, y) -> isPositiveClosure (x, set) && isPositiveClosure (y, set)
+            | Or(x, y) -> isPositiveClosure (x, set) || isPositiveClosure (y, set)
+            | Imp(x, y) -> isPositiveClosure (y, set)
+            | _ -> false
 
     let rec isNegativeClosure (f: Formula, set: Formula list) : bool =
-        match f with
-        | True
-        | False
-        | Atom(_) -> List.contains f set
-        | And(x, y) -> isNegativeClosure (x, set) || isNegativeClosure (y, set)
-        | Or(x, y) -> isNegativeClosure (x, set) && isPositiveClosure (y, set)
-        | Imp(x, y) -> isNegativeClosure (y, set)
-        | _ -> false
+        match List.contains f set with
+        | true -> true
+        | false ->
+            match f with
+            | And(x, y) -> isNegativeClosure (x, set) || isNegativeClosure (y, set)
+            | Or(x, y) -> isNegativeClosure (x, set) && isNegativeClosure (y, set)
+            | Imp(x, y) -> isNegativeClosure (y, set)
+            | _ -> false
 
     let evaluate (f: Formula) = [ true ]

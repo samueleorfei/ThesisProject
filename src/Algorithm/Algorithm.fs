@@ -7,7 +7,7 @@ module Calculus =
 
 
     let generateAxioms (f: Formula) : (Formula list * Formula list) list =
-        let extraction (set: Formula list) : Set<Formula> =
+        (*let extraction (set: Formula list) : Set<Formula> =
             let rec filter (acc: Set<Formula>, fl: Formula list) =
                 match fl with
                 | [] -> acc
@@ -19,7 +19,7 @@ module Calculus =
                     | Imp(_, _) -> filter (Set.add x acc, xs)
                     | _ -> filter (acc, xs)
 
-            filter (Set.empty, set)
+            filter (Set.empty, set)*)
 
         let isValid (l: Set<Formula>, r: Set<Formula>, total: Set<Formula>) =
             let intersectionRule = (Set.intersect l r = Set.empty)
@@ -29,8 +29,8 @@ module Calculus =
 
         let (sl, sr) = Expression.subFormulas f
 
-        let atomsSL = extraction sl
-        let atomsSR = extraction sr
+        let atomsSL = Expression.atoms sl
+        let atomsSR = Expression.atoms sr
 
         let union = Set.union atomsSL atomsSR
 

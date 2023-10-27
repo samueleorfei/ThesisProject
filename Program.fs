@@ -11,4 +11,4 @@ let premises = Expression.fromFile premisesPath
 
 let (sl, sr) = Expression.subFormulas goal
 
-printfn "%A" (Calculus.generateAxioms goal)
+printfn "%A" (Calculus.execute goal)

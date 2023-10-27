@@ -133,23 +133,6 @@ module Expression =
     val isNegativeClosure: Formula * Formula list -> bool
 
     ///
-    /// Questa funzione prende in input una lista di formule e restituisce soltanto gli atomi.
-    ///
-    /// ---
-    ///
-    /// **Parameters**
-    ///
-    /// - <code>Set</code> of formulas
-    ///
-    /// ---
-    ///
-    /// **Returns**
-    ///
-    /// - <code>Set<Formula></code>
-    ///
-    val atoms: Formula list -> Set<Formula>
-
-    ///
     /// Questa funzione prende in input un albero di sintassi di una espressione logica e ne restituisce una valutazione booleana delle costanti
     /// o quantificatori in esso presenti valutando, per ogni nodo, il risultato delle operazioni booleane.
     ///

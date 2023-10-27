@@ -4,37 +4,56 @@ open Models
 open Types
 
 module Calculus =
+    let atoms (set: Formula list) : Set<Formula> =
+        let condition (f: Formula) : bool =
+            match f with
+            | True
+            | False
+            | Atom(_) -> true
+            | _ -> false
 
+        List.filter condition set |> Set.ofList
 
-    let generateAxioms (f: Formula) : (Formula list * Formula list) list =
-        (*let extraction (set: Formula list) : Set<Formula> =
-            let rec filter (acc: Set<Formula>, fl: Formula list) =
-                match fl with
-                | [] -> acc
-                | x :: xs ->
-                    match x with
-                    | True
-                    | False
-                    | Atom(_)
-                    | Imp(_, _) -> filter (Set.add x acc, xs)
-                    | _ -> filter (acc, xs)
+    let gamma (sl: Formula list) : Set<Formula> =
+        let condition (f: Formula) : bool =
+            match f with
+            | True
+            | False
+            | Atom(_)
+            | Imp(_, _)
+            | Not(_) -> true
+            | _ -> false
 
-            filter (Set.empty, set)*)
+        List.filter condition sl |> Set.ofList
 
+    let lambda (sl: Formula list, sr: Formula list) : Set<Formula> = Set.intersect (atoms sl) (atoms sr)
+
+    let delta (sr: Formula list) : Set<Formula> =
+        let condition (f: Formula) : bool =
+            match f with
+            | True
+            | False
+            | Atom(_)
+            | Imp(_, _)
+            | Not(_) -> true
+            | _ -> false
+
+        List.filter condition sr |> Set.ofList
+
+    let generateAxioms (g: Set<Formula>, d: Set<Formula>, l: Set<Formula>) : (Formula list * Formula list) list =
         let isValid (l: Set<Formula>, r: Set<Formula>, total: Set<Formula>) =
             let intersectionRule = (Set.intersect l r = Set.empty)
             let unionRule = (Set.union l r = total)
 
             intersectionRule && unionRule
 
-        let (sl, sr) = Expression.subFormulas f
+        let atomsG = atoms (Set.toList g)
+        let atomsD = atoms (Set.toList d)
+        let atomsL = atoms (Set.toList l)
 
-        let atomsSL = Expression.atoms sl
-        let atomsSR = Expression.atoms sr
+        let union = Set.union atomsG atomsD
 
-        let union = Set.union atomsSL atomsSR
-
-        match isValid (atomsSL, atomsSR, union) with
+        match isValid (atomsG, atomsD, union) with
         | true ->
             let rec combinations (acc: (Formula list * Formula list) list, current: Formula list, set: Formula list) =
                 match set with
@@ -44,4 +63,11 @@ module Calculus =
             combinations ([], [], (Set.toList union))
         | false -> []
 
-    let execute (goal: Formula, premises: Formula list) : Formula list = []
+    let execute (goal: Formula) : (Formula list * Formula list) list =
+        let (sl, sr) = Expression.subFormulas goal
+
+        let g = gamma sl
+        let d = delta sr
+        let l = lambda (sl, sr)
+
+        generateAxioms (g, d, l)

@@ -107,17 +107,4 @@ module Expression =
             | Imp(x, y) -> isNegativeClosure (y, set)
             | _ -> false
 
-    let atoms (set: Formula list) : Set<Formula> =
-        let rec filter (acc: Set<Formula>, fl: Formula list) =
-            match fl with
-            | [] -> acc
-            | x :: xs ->
-                match x with
-                | True
-                | False
-                | Atom(_) -> filter (Set.add x acc, xs)
-                | _ -> filter (acc, xs)
-
-        filter (Set.empty, set)
-
     let evaluate (f: Formula) = [ true ]

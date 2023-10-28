@@ -66,6 +66,8 @@ module Calculus =
     let execute (goal: Formula) : (Formula list * Formula list) list =
         let (sl, sr) = Expression.subFormulas goal
 
+        let sf = sl @ sr
+
         let g = gamma sl
         let d = delta sr
         let l = lambda (sl, sr)

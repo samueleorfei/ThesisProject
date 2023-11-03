@@ -20,14 +20,14 @@ module Expression =
 
     let rec toBinaryTree (f: Formula) : Tree<Formula> =
         match f with
-        | True -> Node(True, Null, Null)
-        | False -> Node(False, Null, Null)
-        | Atom(x: string) -> Node(Atom x, Null, Null)
-        | Not(x: Formula) -> Node(Not x, toBinaryTree x, Null)
-        | And(x: Formula, y: Formula) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
-        | Or(x: Formula, y: Formula) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
-        | Imp(x: Formula, y: Formula) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
-        | Iff(x: Formula, y: Formula) -> Node(And(x, y), toBinaryTree x, toBinaryTree y)
+        | True
+        | False
+        | Atom(_) -> Node(f, Null, Null)
+        | Not(x: Formula) -> Node(f, toBinaryTree x, Null)
+        | And(x: Formula, y: Formula)
+        | Or(x: Formula, y: Formula)
+        | Imp(x: Formula, y: Formula)
+        | Iff(x: Formula, y: Formula) -> Node(f, toBinaryTree x, toBinaryTree y)
 
     let parse (input: string) =
         match Lexer.tokenize input |> Parser.parse with

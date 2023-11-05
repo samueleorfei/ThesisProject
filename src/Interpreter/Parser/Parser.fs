@@ -6,16 +6,16 @@ open Models.Types
 module Parser =
     type ParseError = string
 
-    let parse (tokens: Token<string> list) =
+    let parse (tokens: Token list) =
         let constParser c tokens = Ok(c, tokens)
 
-        let parseIdentifier (tokens: Token<string> list) =
+        let parseIdentifier (tokens: Token list) =
             match tokens with
             | (Identifier x) :: tail -> Ok(x, tail)
             | first :: _ -> Error $"expected an identifier, got {first}"
             | [] -> Error $"expected an identifier, got EOF"
 
-        let parseToken (t: Token<string>, tokens: Token<string> list) =
+        let parseToken (t: Token, tokens: Token list) =
             match tokens with
             | first :: tail when first = t -> Ok(t, tail)
             | first :: _ -> Error $"expected {t}, got {first}"
@@ -34,30 +34,30 @@ module Parser =
                 | Ok(result, rest) -> Ok(result, rest)
                 | Error e -> Error e
 
-        let rec parseOperator (tokens: Token<string> list) =
+        let rec parseOperator (tokens: Token list) =
             match parseTerm tokens with
             | Error _ ->
                 match tokens with
                 | x :: _ ->
                     match parseToken (x, tokens) with
                     | Error(e: string) -> Error e
-                    | Ok(op: Token<string>, ys: Token<string> list) ->
+                    | Ok(op: Token, ys: Token list) ->
                         match parseExpression ys with
                         | Error(e: string) -> Error e
-                        | Ok(k: Formula, ks: Token<string> list) ->
+                        | Ok(k: Formula, ks: Token list) ->
                             match op with
                             | Token.Not -> Ok(Not(k), ks)
                             | _ -> Error $"expected an unary operator, got {op}"
                 | [] -> Error $"expected an unary operator, got EOF"
-            | Ok(x: Formula, xs: Token<string> list) ->
+            | Ok(x: Formula, xs: Token list) ->
                 match xs with
                 | op :: _ ->
                     match parseToken (op, xs) with
                     | Error(e: string) -> Error e
-                    | Ok(operator: Token<string>, ls: Token<string> list) ->
+                    | Ok(operator: Token, ls: Token list) ->
                         match parseExpression ls with
                         | Error(e: string) -> Error e
-                        | Ok(k: Formula, ks: Token<string> list) ->
+                        | Ok(k: Formula, ks: Token list) ->
                             match operator with
                             | Token.And -> Ok(And(x, k), ks)
                             | Token.Or -> Ok(Or(x, k), ks)
@@ -66,16 +66,16 @@ module Parser =
                             | _ -> Error $"expected a binary operator, got {operator}"
                 | [] -> Error $"expected a binary operator, got EOF"
 
-        and parseParenthesis (tokens: Token<string> list) =
+        and parseParenthesis (tokens: Token list) =
             match parseToken (OpenParenthesis, tokens) with
             | Error(e: string) -> Error e
-            | Ok(_, xs: Token<string> list) ->
+            | Ok(_, xs: Token list) ->
                 match parseExpression (xs) with
                 | Error(e: string) -> Error e
-                | Ok(f: Formula, ys: Token<string> list) ->
+                | Ok(f: Formula, ys: Token list) ->
                     match parseToken (ClosedParenthesis, ys) with
                     | Error(e: string) -> Error e
-                    | Ok(_, ks: Token<string> list) -> Ok(f, ks)
+                    | Ok(_, ks: Token list) -> Ok(f, ks)
 
         and parseTerm =
             parseParenthesis <|> (parseIdentifier >>= fun x -> constParser (Atom x))

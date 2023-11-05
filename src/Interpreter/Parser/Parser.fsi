@@ -18,12 +18,12 @@ module Parser =
     ///
     /// **Parameters**
     ///
-    /// - <code>Token<string> list</code> input
+    /// - <code>Token list</code> input
     ///
     /// ---
     ///
     /// **Return**
     ///
-    /// - <code>Result<(Formula * Token<string> list), ParseError></code>
+    /// - <code>Result<(Formula * Token list), ParseError></code>
     ///
-    val parse: Token<string> list -> Result<(Formula * Token<string> list), ParseError>
+    val parse: Token list -> Result<(Formula * Token list), ParseError>

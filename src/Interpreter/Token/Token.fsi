@@ -66,9 +66,9 @@ module Token =
     ///
     /// **Returns**
     ///
-    /// - <code>Token<string></code>
+    /// - <code>Token</code>
     ///
-    val parse: string -> Token<string>
+    val parse: string -> Token
 
     ///
     /// Questa funzione restituisce la stringa corrispondente al <code>Token</code> in input.
@@ -78,7 +78,7 @@ module Token =
     ///
     /// **Parameters**
     ///
-    /// - <code>Token<string></code> token
+    /// - <code>Token</code> token
     ///
     /// ---
     ///
@@ -86,4 +86,4 @@ module Token =
     ///
     /// - <code>string</code>
     ///
-    val toString: Token<string> -> string
+    val toString: Token -> string

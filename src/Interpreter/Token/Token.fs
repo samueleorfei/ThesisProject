@@ -58,7 +58,7 @@ module Token =
         | "\s" -> Whitespace
         | _ -> Identifier input
 
-    let toString (token: Token<string>) =
+    let toString (token: Token) =
         match token with
         | Not -> "--"
         | And -> "&"

@@ -8,8 +8,8 @@ module Types =
         | ClosedParenthesis
         | Operator
 
-    type Token<'T> =
-        | Identifier of 'T
+    type Token =
+        | Identifier of string
         | Whitespace
         | OpenParenthesis
         | ClosedParenthesis

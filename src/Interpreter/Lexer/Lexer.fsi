@@ -20,6 +20,6 @@ module Lexer =
     ///
     /// **Return**
     ///
-    /// - <code>Token<<code>string</code>> list</code>
+    /// - <code>Token list</code>
     ///
-    val tokenize: string -> Token<string> list
+    val tokenize: string -> Token list

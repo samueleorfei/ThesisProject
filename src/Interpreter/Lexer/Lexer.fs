@@ -27,10 +27,7 @@ module Lexer =
             let rec splitByRules (result: string, rules: TokenType list) =
                 match rules with
                 | [] -> result
-                | r :: rs ->
-                    let accumulator: string = split (result, Token.rule r)
-
-                    splitByRules (accumulator, rs)
+                | r :: rs -> splitByRules ((split (result, Token.rule r)), rs)
 
             (splitByRules (input, Token.types ())).Split([| '?' |])
             |> Array.toList

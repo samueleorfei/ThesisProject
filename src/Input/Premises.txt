@@ -1,4 +1,3 @@
-A & D
-C -> J
-j & A
-B | C
+Vero esempio - problemi performance
+
+(((--(q | r)) | (p -> r)) | (((--(--p)) & (p -> q)) -> q)) | (((((--(--p)) & (p -> q)) -> q) -> ((--(--p)) & q)) -> (p | (--q)))

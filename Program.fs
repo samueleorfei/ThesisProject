@@ -4,9 +4,9 @@ open Models
 open Algorithm
 
 let goalPath = "./src/Input/Goal.txt"
-let premisesPath = "./src/Input/Premises.txt"
+//let premisesPath = "./src/Input/Premises.txt"
 
 let goal = List.item 0 (Expression.fromFile goalPath)
-let premises = Expression.fromFile premisesPath
+//let premises = Expression.fromFile premisesPath
 
 printfn "%A" (Calculus.execute goal)

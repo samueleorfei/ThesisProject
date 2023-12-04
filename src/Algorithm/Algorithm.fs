@@ -5,71 +5,145 @@ open Types
 
 module Calculus =
     let atoms (set: Formula list) : Set<Formula> =
-        let condition (f: Formula) : bool =
+        let rec single (acc: Formula list, f: Formula) : Formula list =
+            match f with
+            | True
+            | False -> acc
+            | Atom(_) -> acc @ [ f ]
+            | Not(x) -> single (acc, x)
+            | Imp(x, y)
+            | Or(x, y)
+            | And(x, y)
+            | Iff(x, y) -> single (acc, x) @ single (acc, y)
+
+        List.map (fun x -> single ([], x)) set |> List.fold (@) [] |> Set.ofList
+
+    let imps (set: Formula list) : Set<Formula> =
+        let rec single (acc: Formula list, f: Formula) : Formula list =
             match f with
             | True
             | False
-            | Atom(_) -> true
-            | _ -> false
+            | Atom(_) -> acc
+            | Or(x, y)
+            | And(x, y)
+            | Iff(x, y) -> single (acc, x) @ single (acc, y)
+            | Not(x) -> single (acc @ [ x ], x)
+            | Imp(x, y) -> single (acc @ [ x ], x) @ single (acc @ [ y ], y)
 
-        List.filter condition set |> Set.ofList
+        List.map (fun x -> single ([], x)) set |> List.fold (@) [] |> Set.ofList
 
-    let gamma (sl: Formula list) : Set<Formula> =
-        let condition (f: Formula) : bool =
-            match f with
-            | True
-            | False
-            | Atom(_)
-            | Imp(_, _)
-            | Not(_) -> true
-            | _ -> false
+    let generateAxioms
+        (
+            sl: Formula list,
+            sr: Formula list,
+            sf: Formula list
+        ) : Set<Formula> * Set<Formula> * Set<Formula> =
+        let atomSL = atoms sl
+        let atomSR = atoms sr
+        let atomSF = atoms sf
 
-        List.filter condition sl |> Set.ofList
+        let impSL = imps sl
+        let impSR = imps sr
+        let impSF = imps sf
 
-    let lambda (sl: Formula list, sr: Formula list) : Set<Formula> = Set.intersect (atoms sl) (atoms sr)
+        let atomImpSL = Set.union atomSL impSL
+        let atomImpSR = Set.union atomSR impSR
 
-    let delta (sr: Formula list) : Set<Formula> =
-        let condition (f: Formula) : bool =
-            match f with
-            | True
-            | False
-            | Atom(_)
-            | Imp(_, _)
-            | Not(_) -> true
-            | _ -> false
+        //let axioms = generateAxioms (subSL, subSR)
 
-        List.filter condition sr |> Set.ofList
+        let g = atomSL
+        let d = Set.add False (Set.difference atomSF g)
+        let l = Set.empty
 
-    let generateAxioms (g: Set<Formula>, d: Set<Formula>, l: Set<Formula>) : (Formula list * Formula list) list =
-        let isValid (l: Set<Formula>, r: Set<Formula>, total: Set<Formula>) =
-            let intersectionRule = (Set.intersect l r = Set.empty)
-            let unionRule = (Set.union l r = total)
+        assert (Set.union g atomSR = atomSF)
+        assert (Set.intersect g (Set.difference atomSF g) = Set.empty)
 
-            intersectionRule && unionRule
+        match
+            (Set.union g atomSR = atomSF)
+            && (Set.intersect g (Set.difference atomSF g) = Set.empty)
+        with
+        | true -> (g, d, l)
+        | _ -> failwithf "I sequenti non rispettano le condizioni iniziali"
 
-        let atomsG = atoms (Set.toList g)
-        let atomsD = atoms (Set.toList d)
-        let atomsL = atoms (Set.toList l)
+    let execute (goal: Formula) : Set<Formula> * Set<Formula> * Set<Formula> =
+        // Creare gli insiemi
+        // Generare gli assiomi
+        // Applicare tutte le regole a tutte le combinazioni di assiomi per vedere la strada corretta
 
-        let union = Set.union atomsG atomsD
-
-        match isValid (atomsG, atomsD, union) with
-        | true ->
-            let rec combinations (acc: (Formula list * Formula list) list, current: Formula list, set: Formula list) =
-                match set with
-                | [] -> acc @ [ (current, set) ]
-                | x :: xs -> combinations (acc @ [ (current, set) ], current @ [ x ], xs)
-
-            combinations ([], [], (Set.toList union))
-        | false -> []
-
-    let execute (goal: Formula) : (Formula list * Formula list) list =
         let (sl, sr) = Expression.subFormulas goal
 
         let sf = sl @ sr
 
-        let g = gamma sl
-        let d = delta sr
-        let l = lambda (sl, sr)
+        let (gamma, delta, lambda) = generateAxioms (sl, sr, sf)
 
-        generateAxioms (g, d, l)
+        let rec loop
+            (
+                goal: Formula,
+                gamma: Set<Formula>,
+                delta: Set<Formula>,
+                lambda: Set<Formula>,
+                sl: Formula list,
+                sr: Formula list
+            ) =
+            let leftConditions (f: Formula, gamma: Set<Formula>, delta: Set<Formula>, lambda: Set<Formula>) : bool =
+                let impCondition (f: Formula, gamma: Set<Formula>, delta: Set<Formula>) : bool =
+                    match f with
+                    | Imp(_, _)
+                    | Not(_) -> Set.contains f (Set.union gamma delta) |> not
+                    | _ -> false
+
+                let negative (f: Formula, delta: Set<Formula>, lambda: Set<Formula>) : bool =
+                    match f with
+                    | Imp(x, _)
+                    | Not(x) -> Expression.isNegativeClosure (x, (Set.union delta lambda) |> Set.toList)
+                    | _ -> false
+
+                let positive (f: Formula, gamma: Set<Formula>, lambda: Set<Formula>) : bool =
+                    match f with
+                    | Imp(_, y) -> Expression.isPositiveClosure (y, (Set.union gamma lambda) |> Set.toList)
+                    | Not(_) -> Expression.isPositiveClosure (False, (Set.union gamma lambda) |> Set.toList)
+                    | _ -> false
+
+                impCondition (f, gamma, delta)
+                && negative (f, delta, lambda)
+                && positive (f, gamma, lambda)
+
+            let rightConditions (f: Formula, gamma: Set<Formula>, delta: Set<Formula>, lambda: Set<Formula>) : bool =
+                let impCondition (f: Formula, delta: Set<Formula>) : bool =
+                    match f with
+                    | Imp(_, _)
+                    | Not(_) -> Set.contains f (Set.union delta delta) |> not
+                    | _ -> false
+
+                let negative (f: Formula, delta: Set<Formula>, lambda: Set<Formula>) : bool =
+                    match f with
+                    | Imp(_, y) -> Expression.isNegativeClosure (y, (Set.union delta lambda) |> Set.toList)
+                    | Not(_) -> Expression.isNegativeClosure (False, (Set.union delta lambda) |> Set.toList)
+                    | _ -> false
+
+                let positive (f: Formula, gamma: Set<Formula>) : bool =
+                    match f with
+                    | Imp(x, _)
+                    | Not(x) -> Expression.isPositiveClosure (x, gamma |> Set.toList)
+                    | _ -> false
+
+                impCondition (f, delta) && positive (f, gamma) && negative (f, delta, lambda)
+
+            match Expression.isNegativeClosure (goal, (Set.union delta lambda) |> Set.toList) with
+            | true -> (gamma, delta, lambda)
+            | false ->
+                let leftItems: Formula list =
+                    List.filter (fun x -> leftConditions (x, gamma, delta, lambda)) sl
+
+                match leftItems with
+                | [] ->
+                    let rightItems = List.filter (fun x -> rightConditions (x, gamma, delta, lambda)) sr
+
+                    match rightItems with
+                    | [] ->
+                        printfn "%A" "Succ"
+                        (gamma, delta, lambda) // Succ?
+                    | r :: ri -> loop (goal, gamma, Set.add r delta, lambda, sl, ri)
+                | l :: li -> loop (goal, Set.add l gamma, delta, lambda, li, sr)
+
+        loop (goal, gamma, delta, lambda, sl, sr)

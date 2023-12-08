@@ -60,9 +60,11 @@ module Calculus =
 
         printfn "%s \n" "Creazione dei sequenti iniziali..."
 
-        printfn "Gamma: %A" (Set.map (fun x -> Expression.toString x) g)
-        printfn "Lambda: %A" (Set.map (fun x -> Expression.toString x) l)
-        printfn "Delta: %A \n" (Set.map (fun x -> Expression.toString x) d)
+        printfn
+            "%A =/=> %A; %A \n"
+            (Set.map (fun x -> Expression.toString x) g)
+            (Set.map (fun x -> Expression.toString x) l)
+            (Set.map (fun x -> Expression.toString x) d)
 
         assert (Set.union g atomSR = atomSF)
         assert (Set.intersect g (Set.difference atomSF g) = Set.empty)
@@ -181,9 +183,7 @@ module Calculus =
 
                         printfn "Step: %d, applicazione regola Succ" (Set.count nextLambda)
 
-                        printfn "Gamma: %A" nG
-                        printfn "Lambda: %A" nextLambda
-                        printfn "Delta: %A" nD
+                        printfn "%A =/=> %A; %A" nG nextLambda nD
 
                         printfn "%s \n" "----------------------------------------------------------------------------"
 
@@ -192,18 +192,14 @@ module Calculus =
                         printfn "Step: %d, applicazione regola R->" (Set.count lambda)
                         let nD = Set.add r delta
 
-                        printfn "Gamma: %A" gamma
-                        printfn "Lambda: %A" lambda
-                        printfn "Delta: %A \n" nD
+                        printfn "%A =/=> %A; %A \n" gamma lambda nD
 
                         loop (goal, gamma, nD, lambda, sl, ri)
                 | l :: li ->
                     printfn "Step: %d, applicazione regola L->" (Set.count lambda)
                     let nG = Set.add l gamma
 
-                    printfn "Gamma: %A" nG
-                    printfn "Lambda: %A" lambda
-                    printfn "Delta: %A \n" delta
+                    printfn "%A =/=> %A; %A \n" nG lambda delta
 
                     loop (goal, nG, delta, lambda, li, sr)
 

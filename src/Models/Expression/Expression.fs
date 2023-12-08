@@ -49,11 +49,11 @@ module Expression =
             | Not(x) ->
                 match isRight with
                 | true ->
-                    let (l, r) = sub (left, (Set.add x right), x, isRight)
+                    let (l, r) = sub ((Set.add x left), right, x, false)
 
                     (l, (Set.add f r))
                 | false ->
-                    let (l, r) = sub ((Set.add x left), right, x, isRight)
+                    let (l, r) = sub (left, (Set.add x right), x, true)
 
                     ((Set.add f l), r)
             | And(x, y)

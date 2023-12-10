@@ -114,59 +114,37 @@ module Calculus =
                 sr: Formula list
             ) =
             let leftConditions (f: Formula, gamma: Set<Formula>, delta: Set<Formula>, lambda: Set<Formula>) : bool =
-                let impCondition (f: Formula, gamma: Set<Formula>, delta: Set<Formula>) : bool =
-                    match f with
-                    | Imp(_, _)
-                    | Not(_) -> Set.contains f (Set.union gamma delta) |> not
-                    | _ -> false
-
-                let negative (f: Formula, delta: Set<Formula>, lambda: Set<Formula>) : bool =
-                    match f with
-                    | Imp(x, _)
-                    | Not(x) -> Expression.isNegativeClosure (x, (Set.union delta lambda) |> Set.toList)
-                    | _ -> false
-
-                let negativeSingle (f: Formula, delta: Set<Formula>) : bool =
-                    match f with
-                    | Imp(x, _)
-                    | Not(x) -> Expression.isNegativeClosure (x, delta |> Set.toList)
-                    | _ -> false
-
-                let positive (f: Formula, gamma: Set<Formula>, lambda: Set<Formula>) : bool =
-                    match f with
-                    | Imp(_, y) -> Expression.isPositiveClosure (y, (Set.union gamma lambda) |> Set.toList)
-                    | Not(_) -> Expression.isPositiveClosure (False, (Set.union gamma lambda) |> Set.toList)
-                    | _ -> false
-
                 match Set.count lambda with
-                | 0 -> impCondition (f, gamma, delta) && negativeSingle (f, delta)
+                | 0 ->
+                    match f with
+                    | Imp(x, _)
+                    | Not(x) ->
+                        (Set.contains f (Set.union gamma delta) |> not)
+                        && (Expression.isNegativeClosure (x, delta |> Set.toList))
+                    | _ -> false
                 | _ ->
-                    impCondition (f, gamma, delta)
-                    && negative (f, delta, lambda)
-                    && positive (f, gamma, lambda)
+                    match f with
+                    | Imp(x, y) ->
+                        (Set.contains f (Set.union gamma delta) |> not)
+                        && (Expression.isNegativeClosure (x, (Set.union delta lambda) |> Set.toList))
+                        && (Expression.isPositiveClosure (y, (Set.union gamma lambda) |> Set.toList))
+                    | Not(x) ->
+                        (Set.contains f (Set.union gamma delta) |> not)
+                        && (Expression.isNegativeClosure (x, (Set.union delta lambda) |> Set.toList))
+                        && (Expression.isPositiveClosure (False, (Set.union gamma lambda) |> Set.toList))
+                    | _ -> false
 
             let rightConditions (f: Formula, gamma: Set<Formula>, delta: Set<Formula>, lambda: Set<Formula>) : bool =
-                let impCondition (f: Formula, delta: Set<Formula>) : bool =
-                    match f with
-                    | Imp(_, _)
-                    | Not(_) -> Set.contains f (Set.union delta delta) |> not
-                    | _ -> false
-
-                let negative (f: Formula, delta: Set<Formula>, lambda: Set<Formula>) : bool =
-                    match f with
-                    | Imp(_, y) -> Expression.isNegativeClosure (y, (Set.union delta lambda) |> Set.toList)
-                    | Not(_) -> Expression.isNegativeClosure (False, (Set.union delta lambda) |> Set.toList)
-                    | _ -> false
-
-                let positive (f: Formula, gamma: Set<Formula>) : bool =
-                    match f with
-                    | Imp(x, _)
-                    | Not(x) -> Expression.isPositiveClosure (x, gamma |> Set.toList)
-                    | _ -> false
-
-                match Set.count lambda with
-                | 0 -> impCondition (f, delta) && positive (f, gamma)
-                | _ -> impCondition (f, delta) && positive (f, gamma) && negative (f, delta, lambda)
+                match f with
+                | Imp(x, y) ->
+                    (Set.contains f (Set.union delta delta) |> not)
+                    && (Expression.isPositiveClosure (x, gamma |> Set.toList))
+                    && (Expression.isNegativeClosure (y, (Set.union delta lambda) |> Set.toList))
+                | Not(x) ->
+                    (Set.contains f (Set.union delta delta) |> not)
+                    && (Expression.isNegativeClosure (False, (Set.union delta lambda) |> Set.toList))
+                    && (Expression.isPositiveClosure (x, gamma |> Set.toList))
+                | _ -> false
 
             match (List.length sl = 0 && List.length sr = 0) with
             | true ->
@@ -194,7 +172,7 @@ module Calculus =
 
                             let nextLambda = Set.intersect gamma (atoms (sl @ sr))
                             let nG = (Set.difference gamma nextLambda)
-                            let nD = (Set.union delta nextLambda)
+                            let nD = (Set.union delta lambda)
 
                             printfn "K = %d, applicazione regola Succ" (Set.count nextLambda)
 

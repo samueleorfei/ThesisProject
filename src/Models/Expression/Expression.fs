@@ -49,13 +49,15 @@ module Expression =
             | Not(x) ->
                 match isRight with
                 | true ->
-                    let (l, r) = sub ((Set.add x left), right, x, false)
+                    let (fl, fr) = sub (left, (Set.add False right), False, isRight)
+                    let (sl, sr) = sub ((Set.add x left), right, x, false)
 
-                    (l, (Set.add f r))
+                    ((Set.union fl sl), (Set.add f (Set.union fr sr)))
                 | false ->
-                    let (l, r) = sub (left, (Set.add x right), x, true)
+                    let (fl, fr) = sub ((Set.add x left), right, x, isRight)
+                    let (sl, sr) = sub (left, (Set.add False right), False, true)
 
-                    ((Set.add f l), r)
+                    ((Set.add f (Set.union fl sl)), (Set.union fr sr))
             | And(x, y)
             | Or(x, y) ->
                 match isRight with
@@ -95,6 +97,7 @@ module Expression =
             | And(x, y) -> isPositiveClosure (x, set) && isPositiveClosure (y, set)
             | Or(x, y) -> isPositiveClosure (x, set) || isPositiveClosure (y, set)
             | Imp(_, y) -> isPositiveClosure (y, set)
+            | Not(_) -> isPositiveClosure (False, set)
             | _ -> false
 
     let rec isNegativeClosure (f: Formula, set: Formula list) : bool =

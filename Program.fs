@@ -22,7 +22,7 @@ let atoms (set: Formula list) : Set<Formula> =
 
     List.map (fun x -> single ([], x)) set |> List.fold (@) [] |> Set.ofList
 
-let imps (set: Formula list) : Set<Formula> =
+(*let imps (set: Formula list) : Set<Formula> =
     let rec single (acc: Formula list, f: Formula) : Formula list =
         match f with
         | True
@@ -41,7 +41,16 @@ let imps (set: Formula list) : Set<Formula> =
         | Not(_)
         | Imp(_, _) -> true
         | _ -> false)
-    |> Set.ofList
+    |> Set.ofList*)
+
+let imps (set: Formula list) : Set<Formula> =
+    let condition (f: Formula) : bool =
+        match f with
+        | Imp(_, _)
+        | Not(_) -> true
+        | _ -> false
+
+    List.filter condition set |> Set.ofList
 
 printfn "%s \n" "Lettura della formula da file..."
 
@@ -67,8 +76,8 @@ let impSR = imps sr
 let atomImpSL = Set.union atomSL impSL
 let atomImpSR = Set.union atomSR impSR
 
-printfn "%A" impSL
-printfn "%A" impSR
+//printfn "%A" impSL
+//printfn "%A" impSR
 
 printfn "Formula letta: %s \n" (goal |> Expression.toString)
 
@@ -78,4 +87,8 @@ let (gamma, lambda, delta) = Calculus.execute (goal)
 
 printfn "%s \n" "Fine algoritmo. Sequenti finali:"
 
-printfn "%A =/=> %A; %A \n" gamma lambda delta
+let mappedG = Set.map (fun x -> Expression.toString x) gamma
+let mappedL = Set.map (fun x -> Expression.toString x) lambda
+let mappedD = Set.map (fun x -> Expression.toString x) delta
+
+printfn "%A =/=> %A; %A \n" mappedG mappedL mappedD

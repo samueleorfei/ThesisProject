@@ -86,35 +86,43 @@ module Calculus =
         | _ -> failwithf "I sequenti non rispettano le condizioni iniziali"
 
     let execute (goal: Formula) : Set<Formula> * Set<Formula> * Set<Formula> =
-        printfn "%s \n" "Step 1: calcolo delle sotto-formule del goal"
+        let generateAxioms (sf: Formula list) =
+            let atomsSF = atoms sf
 
-        printfn "%s \n" "Estrapolazione delle sotto-formule dal goal..."
+            let fullLeft = [ (atomsSF, Set.empty, Set.add False Set.empty) ]
+            let fullRight = [ (Set.empty, Set.empty, Set.add False atomsSF) ]
 
-        let (sl, sr) = Expression.subFormulas goal
+            let leftToRight =
+                Set.toList atomsSF
+                |> List.map (fun x ->
+                    ((Set.ofList [ x ]), (Set.empty), (Set.add False (Set.difference atomsSF (Set.ofList [ x ])))))
 
-        let sf = sl @ sr
+            let rightToLeft =
+                Set.toList atomsSF
+                |> List.map (fun x ->
+                    ((Set.difference atomsSF (Set.ofList [ x ])), (Set.empty), (Set.add False (Set.ofList [ x ]))))
 
-        let impSL = imps sl |> Set.toList
-        let impSR = imps sr |> Set.toList
+            fullLeft @ rightToLeft @ leftToRight @ fullRight
 
-        printfn "Sotto-formule sinistre: %A \n" (List.map (fun x -> Expression.toString x) sl)
-        printfn "Sotto-formule destre: %A \n" (List.map (fun x -> Expression.toString x) sr)
-
-        printfn "%s \n" "Step 2: generazione degli assiomi di partenza"
-
-        let (gamma, lambda, delta) = generateAxioms (sl, sr, sf)
-
-        let rec loop
+        let rec proof
             (
                 goal: Formula,
                 gamma: Set<Formula>,
                 delta: Set<Formula>,
                 lambda: Set<Formula>,
                 sl: Formula list,
-                sr: Formula list
+                sr: Formula list,
+                k: int
             ) =
-            let leftConditions (f: Formula, gamma: Set<Formula>, delta: Set<Formula>, lambda: Set<Formula>) : bool =
-                match Set.count lambda with
+            let leftConditions
+                (
+                    f: Formula,
+                    gamma: Set<Formula>,
+                    delta: Set<Formula>,
+                    lambda: Set<Formula>,
+                    k: int
+                ) : bool =
+                match k with
                 | 0 ->
                     match f with
                     | Imp(x, _)
@@ -136,7 +144,7 @@ module Calculus =
 
             let rightConditions (f: Formula, gamma: Set<Formula>, delta: Set<Formula>, lambda: Set<Formula>) : bool =
                 match f with
-                | Imp(x, y) ->
+                | Imp(x: Formula, y) ->
                     (Set.contains f (Set.union delta delta) |> not)
                     && (Expression.isPositiveClosure (x, gamma |> Set.toList))
                     && (Expression.isNegativeClosure (y, (Set.union delta lambda) |> Set.toList))
@@ -159,7 +167,7 @@ module Calculus =
                     (gamma, lambda, delta)
                 | false ->
                     let leftItems: Formula list =
-                        List.filter (fun x -> leftConditions (x, gamma, delta, lambda)) sl
+                        List.filter (fun x -> leftConditions (x, gamma, delta, lambda, k)) sl
 
                     match leftItems with
                     | [] ->
@@ -170,11 +178,16 @@ module Calculus =
                             printfn "%s" "Saturazione..."
                             printfn "%s" "----------------------------------------------------------------------------"
 
-                            let nextLambda = Set.intersect gamma (atoms (sl @ sr))
+                            // Testare tutti i possibili lambda primo: [p, q, r], [p, q], [p, r], [q, r], [p], [q], [r]
+
+                            let nextLambda =
+                                Set.intersect (atoms (gamma |> Set.toList)) (atoms (delta |> Set.toList)) //Set.intersect gamma (atoms (sl @ sr)) Sistemare calcolo di nextLambda
+
                             let nG = (Set.difference gamma nextLambda)
                             let nD = (Set.union delta lambda)
+                            let nK = k + 1
 
-                            printfn "K = %d, applicazione regola Succ" (Set.count nextLambda)
+                            printfn "K = %d, applicazione regola Succ" nK
 
                             let mappedG = Set.map (fun x -> Expression.toString x) nG
                             let mappedL = Set.map (fun x -> Expression.toString x) nextLambda
@@ -186,9 +199,9 @@ module Calculus =
                                 "%s \n"
                                 "----------------------------------------------------------------------------"
 
-                            loop (goal, nG, nD, nextLambda, sl, sr)
+                            proof (goal, nG, nD, nextLambda, sl, sr, nK)
                         | r :: ri ->
-                            printfn "K = %d, applicazione regola R->" (Set.count lambda)
+                            printfn "K = %d, applicazione regola R->" k
                             let nD = Set.add r delta
 
                             let mappedG = Set.map (fun x -> Expression.toString x) gamma
@@ -197,9 +210,9 @@ module Calculus =
 
                             printfn "%A =/=> %A; %A \n" mappedG mappedL mappedD
 
-                            loop (goal, gamma, nD, lambda, sl, (List.filter (fun x -> x <> r) sr))
+                            proof (goal, gamma, nD, lambda, sl, (List.filter (fun x -> x <> r) sr), k)
                     | l :: li ->
-                        printfn "K = %d, applicazione regola L->" (Set.count lambda)
+                        printfn "K = %d, applicazione regola L->" k
                         let nG = Set.add l gamma
 
                         let mappedG = Set.map (fun x -> Expression.toString x) nG
@@ -208,8 +221,59 @@ module Calculus =
 
                         printfn "%A =/=> %A; %A \n" mappedG mappedL mappedD
 
-                        loop (goal, nG, delta, lambda, (List.filter (fun x -> x <> l) sl), sr)
+                        proof (goal, nG, delta, lambda, (List.filter (fun x -> x <> l) sl), sr, k)
+
+
+        printfn "%s \n" "Step 1: calcolo delle sotto-formule del goal"
+
+        printfn "%s \n" "Estrapolazione delle sotto-formule dal goal..."
+
+        let (sl, sr) = Expression.subFormulas goal
+
+        let sf = sl @ sr
+
+        let impSL = imps sl |> Set.toList
+        let impSR = imps sr |> Set.toList
+
+        printfn "Sotto-formule sinistre: %A \n" (List.map (fun x -> Expression.toString x) sl)
+        printfn "Sotto-formule destre: %A \n" (List.map (fun x -> Expression.toString x) sr)
+
+        printfn "%s \n" "Step 2: generazione degli assiomi di partenza"
+
+        let axioms = generateAxioms (sf)
 
         printfn "%s \n" "Step 3: inizio del calcolo ricorsivo"
 
-        loop (goal, gamma, delta, lambda, impSL, impSR)
+        let rec loop
+            (
+                goal: Formula,
+                sf: Formula list,
+                sl: Formula list,
+                sr: Formula list,
+                axioms: (Set<Formula> * Set<Formula> * Set<Formula>) list
+            ) =
+            match axioms with
+            | [] -> failwith "Nessun assioma disponibile"
+            | (gamma, lambda, delta) :: ax ->
+                printfn "Ax"
+
+                printfn
+                    "%A =/=> %A; %A \n"
+                    (Set.map (fun x -> Expression.toString x) gamma)
+                    (Set.map (fun x -> Expression.toString x) lambda)
+                    (Set.map (fun x -> Expression.toString x) delta)
+
+                let firstCondition = (Set.union gamma (atoms (delta |> Set.toList)) = (atoms sf))
+
+                let secondCondition =
+                    (Set.intersect gamma (atoms (delta |> Set.toList)) = Set.empty)
+
+                assert firstCondition
+                assert secondCondition
+
+                match firstCondition && secondCondition with
+                | true -> (gamma, lambda, delta)
+                | _ -> failwithf "I sequenti non rispettano le condizioni iniziali"
+
+        //loop (goal, gamma, delta, lambda, impSL, impSR, 0)
+        loop (goal, sf, impSL, impSR, axioms |> List.take 1)

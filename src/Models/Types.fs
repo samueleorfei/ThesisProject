@@ -14,3 +14,9 @@ module Types =
     type Tree<'T> =
         | Null
         | Node of 'T * Tree<'T> * Tree<'T>
+
+    type Rule =
+        | Ax
+        | Left
+        | Right
+        | Succ

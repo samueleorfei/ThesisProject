@@ -136,63 +136,79 @@ module Calculus =
                     && (Expression.isPositiveClosure (x, gamma |> Set.toList))
                 | _ -> false
 
-            match (List.length sl = 0 && List.length sr = 0) with
+            let endCondition =
+                (List.length sl = 0 && List.length sr = 0)
+                || Expression.isNegativeClosure (goal, (Set.union delta lambda) |> Set.toList)
+
+            match endCondition with
             | true -> Some history
             | false ->
-                match Expression.isNegativeClosure (goal, (Set.union delta lambda) |> Set.toList) with
-                | true -> Some history
-                | false ->
-                    let leftItems: Formula list =
-                        List.filter (fun x -> leftConditions (x, gamma, delta, lambda, k)) sl
+                let leftItems: Formula list =
+                    List.filter (fun x -> leftConditions (x, gamma, delta, lambda, k)) sl
 
-                    match leftItems with
-                    | [] ->
-                        let rightItems = List.filter (fun x -> rightConditions (x, gamma, delta, lambda)) sr
+                let rightItems = List.filter (fun x -> rightConditions (x, gamma, delta, lambda)) sr
 
-                        match rightItems with
-                        | [] ->
-                            let nextLambda =
-                                Set.intersect (atoms (gamma |> Set.toList)) (atoms (delta |> Set.toList))
+                match (leftItems, rightItems) with
+                | ([], []) ->
+                    let nextLambda =
+                        Set.intersect (atoms (gamma |> Set.toList)) (atoms (delta |> Set.toList))
 
-                            let rec controlCombinations (combs, lambda) =
-                                match combs with
-                                | [] -> None
-                                | c :: cs ->
-                                    match c = lambda with
-                                    | true -> None
-                                    | _ ->
-                                        let nG = (Set.difference gamma c)
-                                        let nD: Set<Formula> = (Set.union delta lambda)
-                                        let nK = k + 1
+                    let rec controlCombinations (combs, lambda) =
+                        match combs with
+                        | [] -> None
+                        | c :: cs ->
+                            match c = lambda with
+                            | true -> None
+                            | _ ->
+                                let nG = (Set.difference gamma c)
+                                let nD: Set<Formula> = (Set.union delta lambda)
+                                let nK = k + 1
 
-                                        let nextHistory = history @ [ (Succ, nG, c, nD, nK) ]
+                                let nextHistory = history @ [ (Succ, nG, c, nD, nK) ]
 
-                                        let res = proof (goal, nG, nD, c, sl, sr, nK, nextHistory)
+                                let res = proof (goal, nG, nD, c, sl, sr, nK, nextHistory)
 
-                                        match res with
-                                        | None -> controlCombinations (cs, lambda)
-                                        | _ -> res
+                                match res with
+                                | None -> controlCombinations (cs, lambda)
+                                | _ -> res
 
-                            match nextLambda = lambda with
-                            | false ->
-                                controlCombinations (
-                                    List.map (fun x -> Set.ofList x) (combinations (nextLambda |> Set.toList)),
-                                    lambda
-                                )
-                            | _ -> None
+                    match nextLambda = lambda with
+                    | false ->
+                        controlCombinations (
+                            List.map (fun x -> Set.ofList x) (combinations (nextLambda |> Set.toList)),
+                            lambda
+                        )
+                    | _ -> None
+                | (l :: _, r :: _) ->
+                    let nD = Set.add r delta
+                    let nG = Set.add l gamma
 
-                        | r :: ri ->
-                            let nD = Set.add r delta
+                    let rightHistory = history @ [ (Right, gamma, lambda, nD, k) ]
+                    let leftHistory = history @ [ (Left, nG, lambda, delta, k) ]
 
-                            let nextHistory = history @ [ (Right, gamma, lambda, nD, k) ]
+                    let lr =
+                        proof (goal, nG, delta, lambda, (List.filter (fun x -> x <> l) sl), sr, k, leftHistory)
 
-                            proof (goal, gamma, nD, lambda, sl, (List.filter (fun x -> x <> r) sr), k, nextHistory)
-                    | l :: li ->
-                        let nG = Set.add l gamma
+                    let rr =
+                        proof (goal, gamma, nD, lambda, sl, (List.filter (fun x -> x <> r) sr), k, rightHistory)
 
-                        let nextHistory = history @ [ (Left, nG, lambda, delta, k) ]
+                    match (lr, rr) with
+                    | (Some(x), Some(y)) -> Some x
+                    | (None, Some y) -> Some y
+                    | (Some x, None) -> Some x
+                    | (None, None) -> None
+                | (l :: _, []) ->
+                    let nG = Set.add l gamma
 
-                        proof (goal, nG, delta, lambda, (List.filter (fun x -> x <> l) sl), sr, k, nextHistory)
+                    let leftHistory = history @ [ (Left, nG, lambda, delta, k) ]
+
+                    proof (goal, nG, delta, lambda, (List.filter (fun x -> x <> l) sl), sr, k, leftHistory)
+                | ([], r :: _) ->
+                    let nD = Set.add r delta
+
+                    let rightHistory = history @ [ (Right, gamma, lambda, nD, k) ]
+
+                    proof (goal, gamma, nD, lambda, sl, (List.filter (fun x -> x <> r) sr), k, rightHistory)
 
 
         printfn "%s \n" "Step 1: calcolo delle sotto-formule del goal"

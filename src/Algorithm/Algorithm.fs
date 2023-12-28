@@ -266,6 +266,6 @@ module Calculus =
                     match proof (goal, gamma, delta, lambda, sl, sr, 0, [ (Ax, gamma, lambda, delta, 0) ]) with
                     | Some(result) -> Some result
                     | None -> loop (goal, sf, sl, sr, ax)
-                | _ -> failwithf "I sequenti non rispettano le condizioni iniziali"
+                | _ -> loop(goal, sf, sl, sr, ax)
 
         loop (goal, sf, impSL, impSR, axioms)
